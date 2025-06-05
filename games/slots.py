@@ -1,4 +1,5 @@
-import random
+from games import utils
+from datetime import datetime
 
 RULES = """
 Правила игры в Слоты.
@@ -20,7 +21,7 @@ RULES = """
 
 fruits =  ["🍓", "🍌", "🍒", "🍍", "🍑", "🌈", "💀"]
 weights = [10,   15,   9,    8,    10,   1,    1   ]
-secrw =   [1,    2,    1,    3,    2,    10,   10  ]
+secrw =   [3,    2,    1,    3,    2,    5,    5  ]
 
 fruits_weighted = []
 for i in range(7):
@@ -31,8 +32,7 @@ for i in range(7):
     secret_weighted += [fruits[i]] * secrw[i]
 
 def _spin(arr: list[str]) -> str:
-    random.shuffle(arr)
-    return "".join(random.choice(arr) for i in range(3))
+    return "".join(utils.choice(arr) for i in range(3))
 
 
 def secret_regen():
@@ -41,7 +41,7 @@ def secret_regen():
 
 secret_regen()
 
-def spin(db, id: int) -> str:
+def spin(db, dt, id: int) -> str:
     global SECRET
 
     s = _spin(fruits_weighted)
@@ -53,6 +53,10 @@ def spin(db, id: int) -> str:
     newbal = bal - 2
     comb = ""
 
+    if s == SECRET:
+        newbal += utils.randint(-1000, 1000)
+        comb += "secret; "
+
     match s:
         case "🍌🍌🍌":
             newbal += 1
@@ -62,7 +66,7 @@ def spin(db, id: int) -> str:
             comb = "Клубничка хмм"
         case "🍒🍒🍒":
             newbal += 15
-            comb = "В лес по ягоды"
+            comb = "🍒Мама! Я спелая вишня🍒"
         case "🍍🍍🍍":
             newbal -= 30
             comb = "идешь в ананас"
@@ -75,10 +79,14 @@ def spin(db, id: int) -> str:
         case "💀💀💀":
             newbal = 0
             comb = "Вы проиграли хату"
+            dt.set_date(id, int(datetime.now().timestamp()) + 60 * 60 * 5)
+        case "🍌🍑🍌":
+            newbal += utils.randint(-50, 50)
+            comb = "Пайпер Перри..?"
         case _:
-            if s == SECRET:
-                newbal += random.randint(-1000, 1000)
-                comb += "secret; "
+            if s.count("🍑") == 2 and s.count("🍍") == 1:
+                newbal += 25
+                comb = "суй ананас.."
             if s.count("🌈") == 1:
                 newbal += 10
                 comb += "1 радуга; "
@@ -92,9 +100,9 @@ def spin(db, id: int) -> str:
                 newbal -= 100
                 comb += "2 черепа; "
     if not comb: comb = "ничего"
-    if db.update_bal(id, newbal):
-        if db.add_slot(id):
-            return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
-        return ["Ошибка при крутке"]
+    if db.update_bal(id, newbal) and db.add_slot(id):
+        if newbal < 0:
+            dt.set_date(id, dt.get_date(id).date + 10 * abs(newbal))
+        return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

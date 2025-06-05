@@ -6,7 +6,9 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
 from games import slots, blackjack
-from db.database import CasinoBase
+from db.database import CasinoUsers, CasinoDates
+
+from datetime import datetime
 
 dotenv.load_dotenv()
 
@@ -23,18 +25,30 @@ HELP = """
 /slots - крутить слоты
 /dodep - додеп
 /top - топ казино
+
+Контакты: @ya_blinchik, @Luckich000
 """
 
-db = CasinoBase()
+db = CasinoUsers()
+dt = CasinoDates()
 db.init()
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 
+async def send_news(text):
+    users = db.users_list()
+    if not users is None:
+        for u in users:
+            await bot.send_message(u.id, "- Новость от админа -\n" + text)
+
 @dp.message(Command("start"))
 async def gay_start(msg: types.Message):
-    if db.register(msg.from_user.id, "@" + msg.from_user.username):
+    if db.register(
+        msg.from_user.id,
+        ("@" + msg.from_user.username) if not msg.from_user.username is None else msg.from_user.full_name
+        ) and dt.add_user(msg.from_user.id):
         await msg.answer("Регистрация успешна!\n/help - список команд")
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/help - список команд")
@@ -50,7 +64,7 @@ async def gay_profile(msg: types.Message):
         await msg.answer("Вы не зарегистрированы!\n/start")
     await msg.answer(
         f"Пользователь: {user.name}"
-         + f"\nБаланс: {user.balance}" + ("(вы в долгах)" if user.balance < 0 else "")
+         + f"\nБаланс: {user.balance}" + (" (вы в долгах)" if user.balance < 0 else "")
          + f"\nКруток слотов: {user.slots_num}"
          + f"\nДодепов: {user.dodep_num}"
         )
@@ -61,19 +75,29 @@ async def gay_ref(msg: types.Message):
 
 @dp.message(Command("slots"))
 async def gay_spin(msg: types.Message):
-    msgs = slots.spin(db, msg.from_user.id)
+    msgs = slots.spin(db, dt, msg.from_user.id)
     for m in msgs:
         await msg.answer(m)
+    
+    if msgs[0] == "🌈🌈🌈":
+        await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
+    if msgs[0] == "💀💀💀":
+        await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
 @dp.message(Command("dodep"))
 async def gay_dodep(msg: types.Message):
-    if db.update_bal(msg.from_user.id, 100):
-        if db.add_dodep(msg.from_user.id):
+    if dt.get_date(msg.from_user.id) is None:
+        dt.add_user(msg.from_user.id)
+
+    tdt = int(datetime.now().timestamp())
+    last_dodep = dt.get_date(msg.from_user.id).date
+    if tdt - last_dodep < 600:
+        await msg.answer(f"подождите {(600 - tdt + last_dodep) // 60} минут {(600 - tdt + last_dodep) % 60} секунд")
+    else:
+        if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(msg.from_user.id, tdt):
             await msg.answer("додеп прошел")
         else:
             await msg.answer("додеп не прошел")
-    else:
-        await msg.answer("додеп не прошел")
 
 @dp.message(Command("top"))
 async def gay_top(msg: types.Message):
