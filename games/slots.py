@@ -20,17 +20,31 @@ RULES = """
 
 fruits =  ["🍓", "🍌", "🍒", "🍍", "🍑", "🌈", "💀"]
 weights = [10,   15,   9,    8,    10,   1,    1   ]
+secrw =   [1,    2,    1,    3,    2,    10,   10  ]
 
 fruits_weighted = []
 for i in range(7):
     fruits_weighted += [fruits[i]] * weights[i]
 
-def _spin() -> str:
-    random.shuffle(fruits_weighted)
-    return "".join(random.choice(fruits_weighted) for i in range(3))
+secret_weighted = []
+for i in range(7):
+    secret_weighted += [fruits[i]] * secrw[i]
+
+def _spin(arr: list[str]) -> str:
+    random.shuffle(arr)
+    return "".join(random.choice(arr) for i in range(3))
+
+
+def secret_regen():
+    global SECRET
+    SECRET = _spin(secret_weighted)
+
+secret_regen()
 
 def spin(db, id: int) -> str:
-    s = _spin()
+    global SECRET
+
+    s = _spin(fruits_weighted)
     bal = db.get_bal(id)
     if db.get_user(id) == False:
         return ["Вы еще не зарегистрированы!\n/start"]
@@ -62,6 +76,9 @@ def spin(db, id: int) -> str:
             newbal = 0
             comb = "Вы проиграли хату"
         case _:
+            if s == SECRET:
+                newbal += random.randint(-1000, 1000)
+                comb += "secret; "
             if s.count("🌈") == 1:
                 newbal += 10
                 comb += "1 радуга; "

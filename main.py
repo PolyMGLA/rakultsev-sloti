@@ -10,9 +10,11 @@ from db.database import CasinoBase
 
 dotenv.load_dotenv()
 
-RULES = "\n\n".join([slots.RULES, blackjack.RULES])
+ADMINS = list(map(int, os.environ["ADMINS"].split(",")))
+
+RULES = "".join([slots.RULES, blackjack.RULES])
 HELP = """
-Казино Ракульцев
+- Казино Ракульцев -
 
 /start - регистрация
 /profile - ваш профиль
@@ -99,6 +101,18 @@ async def gay_top(msg: types.Message):
         res += "\n".join([f"{i + 1}. {top[i].name} - {top[i].dodep_num}" for i in range(len(top))]) + "\n\n"
 
     await msg.answer(res)
+
+@dp.message(Command("secret"))
+async def gay_secret(msg: types.Message):
+    if msg.from_user.id in ADMINS:
+        await msg.answer("Секрет: " + slots.SECRET)
+
+@dp.message(Command("gen"))
+async def gay_secret(msg: types.Message):
+    if msg.from_user.id in ADMINS:
+        slots.secret_regen()
+        await msg.answer("Новый секрет: " + slots.SECRET)
+
 
 async def main():
     print("starting bot..")

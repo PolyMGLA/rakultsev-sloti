@@ -87,7 +87,7 @@ class CasinoBase(Base):
     def top5_money(self) -> list:
         with self.session_maker() as session:
             try:
-                user = session.query(CasinoBase).order_by(CasinoBase.balance).all()[-5:]
+                user = session.query(CasinoBase).order_by(CasinoBase.balance).all()[-5:][::-1]
                 return user
             except Exception as e:
                 print(str(e))
@@ -96,7 +96,7 @@ class CasinoBase(Base):
     def top5_slots(self) -> list:
         with self.session_maker() as session:
             try:
-                user = session.query(CasinoBase).order_by(CasinoBase.slots_num).all()[-5:]
+                user = session.query(CasinoBase).order_by(CasinoBase.slots_num).all()[-5:][::-1]
                 return user
             except Exception as e:
                 print(str(e))
@@ -105,7 +105,7 @@ class CasinoBase(Base):
     def top5_dodeps(self) -> list:
         with self.session_maker() as session:
             try:
-                user = session.query(CasinoBase).order_by(CasinoBase.dodep_num).all()[-5:]
+                user = session.query(CasinoBase).order_by(CasinoBase.dodep_num).all()[-5:][::-1]
                 return user
             except Exception as e:
                 print(str(e))
