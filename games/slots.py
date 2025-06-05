@@ -13,13 +13,13 @@ RULES = """
 🍑🍑🍑 - не щовел (получаете 40р)
 🌈🌈🌈 - Absolute cinema
 💀💀💀 - Вы проиграли хату
-GOIDA  - Также есть доп.бонусы)
+? ? ? ? ? ?  - Также есть доп.бонусы)
 
 Играть: /slots
 """
 
 fruits =  ["🍓", "🍌", "🍒", "🍍", "🍑", "🌈", "💀"]
-weights = [10,   15,   9,    8,    10,   1,    1]
+weights = [10,   15,   9,    8,    10,   1,    1   ]
 
 fruits_weighted = []
 for i in range(7):
@@ -76,6 +76,8 @@ def spin(db, id: int) -> str:
                 comb += "2 черепа; "
     if not comb: comb = "ничего"
     if db.update_bal(id, newbal):
-        return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
+        if db.add_slot(id):
+            return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
+        return ["Ошибка при крутке"]
 
     return ["Ошибка при крутке"]

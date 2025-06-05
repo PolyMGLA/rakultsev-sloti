@@ -11,7 +11,8 @@ class CasinoBase(Base):
     id = Column("id", Integer, primary_key=True)
     name = Column("name", String)
     balance = Column("balance", Integer, default=100)
-    maxbal = Column("maxbal", Integer, default=100)
+    slots_num = Column("slots_num", Integer, default=0)
+    dodep_num = Column("dodep_num", Integer, default=0)
     session_maker = sessionmaker(bind=engine)
 
     def init(self):
@@ -52,9 +53,60 @@ class CasinoBase(Base):
             try:
                 user = session.query(CasinoBase).filter_by(id=id).first()
                 user.balance = newbal
-                user.maxbal = max(user.maxbal, newbal)
                 session.commit()
                 return True
+            except Exception as e:
+                session.rollback()
+                print(str(e))
+                return False
+            
+    def add_slot(self, id: int) -> bool:
+        with self.session_maker() as session:
+            try:
+                user = session.query(CasinoBase).filter_by(id=id).first()
+                user.slots_num += 1
+                session.commit()
+                return True
+            except Exception as e:
+                session.rollback()
+                print(str(e))
+                return False
+            
+    def add_dodep(self, id: int) -> bool:
+        with self.session_maker() as session:
+            try:
+                user = session.query(CasinoBase).filter_by(id=id).first()
+                user.dodep_num += 1
+                session.commit()
+                return True
+            except Exception as e:
+                session.rollback()
+                print(str(e))
+                return False
+            
+    def top5_money(self) -> list:
+        with self.session_maker() as session:
+            try:
+                user = session.query(CasinoBase).order_by(CasinoBase.balance).all()[-5:]
+                return user
+            except Exception as e:
+                print(str(e))
+                return False
+            
+    def top5_slots(self) -> list:
+        with self.session_maker() as session:
+            try:
+                user = session.query(CasinoBase).order_by(CasinoBase.slots_num).all()[-5:]
+                return user
+            except Exception as e:
+                print(str(e))
+                return False
+    
+    def top5_dodeps(self) -> list:
+        with self.session_maker() as session:
+            try:
+                user = session.query(CasinoBase).order_by(CasinoBase.dodep_num).all()[-5:]
+                return user
             except Exception as e:
                 print(str(e))
                 return False
