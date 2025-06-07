@@ -79,7 +79,7 @@ async def gay_profile(msg: types.Message):
 async def gay_ref(msg: types.Message):
     await msg.answer(RULES)
 
-                                                    #функция для вызова информации о комбинациях
+                                                    #функция для круток
 @dp.message(Command("slots"))
 async def gay_spin(msg: types.Message):
     msgs = slots.spin(db, dt, msg.from_user.id)
