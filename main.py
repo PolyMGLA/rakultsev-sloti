@@ -1,20 +1,21 @@
+                                                                    #импорт всякой залупы
 import os
 import dotenv
-
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
-
+from aiogram.filters import Command, CommandObject
+from aiogram.types import Message
+from aiogram.utils.formatting import Bold
 from games import slots, blackjack
 from db.database import CasinoUsers, CasinoDates
-
 from datetime import datetime
 
 dotenv.load_dotenv()
-
+                                                                        #лист админов
 ADMINS = list(map(int, os.environ["ADMINS"].split(",")))
-
+                                                                    #текст правил
 RULES = "".join([slots.RULES, blackjack.RULES])
+                                                                    #текст помощи
 HELP = """
 - Казино Ракульцев -
 
@@ -28,21 +29,23 @@ HELP = """
 
 Контакты: @ya_blinchik, @Luckich000
 """
-
+                                                                    #дб-шки
 db = CasinoUsers()
 dt = CasinoDates()
 db.init()
-
+                                                                    #рег бота
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 
+                                                                #функция для отправки новостей
 async def send_news(text):
     users = db.users_list()
     if not users is None:
         for u in users:
-            await bot.send_message(u.id, "- Новость от админа -\n" + text)
+            await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
 
+                                                                #функция для регистрации
 @dp.message(Command("start"))
 async def gay_start(msg: types.Message):
     if db.register(
@@ -53,10 +56,12 @@ async def gay_start(msg: types.Message):
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/help - список команд")
 
+                                                            #функция для вызыва текста помощи
 @dp.message(Command("help"))
 async def gay_help(msg: types.Message):
     await msg.answer(HELP)
 
+                                                        #функция для вызова информации профиля
 @dp.message(Command("profile"))
 async def gay_profile(msg: types.Message):
     user = db.get_user(msg.from_user.id)
@@ -69,10 +74,12 @@ async def gay_profile(msg: types.Message):
          + f"\nДодепов: {user.dodep_num}"
         )
 
+                                                    #функция для вызова текста правил
 @dp.message(Command("rules"))
 async def gay_ref(msg: types.Message):
     await msg.answer(RULES)
 
+                                                    #функция для вызова информации о комбинациях
 @dp.message(Command("slots"))
 async def gay_spin(msg: types.Message):
     msgs = slots.spin(db, dt, msg.from_user.id)
@@ -84,6 +91,7 @@ async def gay_spin(msg: types.Message):
     if msgs[0] == "💀💀💀":
         await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
+                                                        #функция для получания додепа
 @dp.message(Command("dodep"))
 async def gay_dodep(msg: types.Message):
     if dt.get_date(msg.from_user.id) is None:
@@ -99,6 +107,7 @@ async def gay_dodep(msg: types.Message):
         else:
             await msg.answer("додеп не прошел")
 
+                                                        #функция для вызова топа
 @dp.message(Command("top"))
 async def gay_top(msg: types.Message):
     top = db.top5_money()
@@ -126,16 +135,33 @@ async def gay_top(msg: types.Message):
 
     await msg.answer(res)
 
+                                                                #функция для просмотра секретной комбинации(админ онли)
 @dp.message(Command("secret"))
 async def gay_secret(msg: types.Message):
     if msg.from_user.id in ADMINS:
         await msg.answer("Секрет: " + slots.SECRET)
+    else:
+        await msg.answer("ты не достоин")
 
+                                                            #функция для изменения секретной комбинации(админ онли)
 @dp.message(Command("gen"))
 async def gay_secret(msg: types.Message):
     if msg.from_user.id in ADMINS:
         slots.secret_regen()
         await msg.answer("Новый секрет: " + slots.SECRET)
+    else:
+        await msg.answer("ты не достоин")
+
+                                                            #функция для создания новостей(админ онли)
+@dp.message(Command("novost"))
+async def gay_novost(msg: Message,command: CommandObject):
+    if msg.from_user.id in ADMINS:
+        if command.args is None:
+            await msg.answer("ашипка: напишите новость\n /novost <новость>")
+            return
+        await send_news(command.args)
+    else:
+        await msg.answer("ты не достоин")
 
 
 async def main():

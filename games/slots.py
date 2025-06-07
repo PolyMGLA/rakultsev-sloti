@@ -49,7 +49,7 @@ def spin(db, dt, id: int) -> str:
     if db.get_user(id) == False:
         return ["Вы еще не зарегистрированы!\n/start"]
     if bal < 2:
-        return ["Недостаточно денег.\nСделайте додеп /dodep"]
+        return ["Недостаточно денег.\nБез додепа не разобраться\n /dodep"]
     newbal = bal - 2
     comb = ""
 
