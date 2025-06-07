@@ -31,7 +31,6 @@ HELP = """
 
 ADMIN_HELP = """
 - список команд для админов - 
-/spisok - посмотреть список участников
 /secret - посмотреть секретную комбинацию
 /gen - сгенерировать новую секретку
 /novost - прислать новость для всех участников
@@ -67,12 +66,12 @@ async def gay_start(msg: types.Message):
         await msg.answer("Регистрация не удалась, поплачь(\n/help - список команд")
 
                                                             #функция для вызыва текста помощи
-@dp.message(Command("help"))
+@dp.message(F.text.lower() == "🆘помощь🆘")
 async def gay_help(msg: types.Message):
     await msg.answer(HELP)
 
                                                         #функция для вызова информации профиля
-@dp.message(Command("profile"))
+@dp.message(F.text.lower() == "👾профиль👾")
 async def gay_profile(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     if user is None or user == False:
@@ -91,12 +90,12 @@ async def gay_profile(msg: types.Message):
 #        db.update_bal(msg.from_user.id, 0)
 
                                                     #функция для вызова текста правил
-@dp.message(Command("rules"))
+@dp.message(F.text.lower() == "🔥правила🔥")
 async def gay_ref(msg: types.Message):
     await msg.answer(RULES)
 
                                                     #функция для круток
-@dp.message(Command("slots"))
+@dp.message(F.text.lower() == "✨крутить✨")
 async def gay_spin(msg: types.Message):
     msgs = slots.spin(db, dt, msg.from_user.id)
     for m in msgs:
@@ -110,7 +109,7 @@ async def gay_spin(msg: types.Message):
         await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
                                                         #функция для получания додепа
-@dp.message(Command("dodep"))
+@dp.message(F.text.lower() == "💲мега ласт деп💲")
 async def gay_dodep(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     if user.balance<=1:
@@ -130,7 +129,7 @@ async def gay_dodep(msg: types.Message):
         await msg.answer("вы слишком богатые")
 
                                                         #функция для вызова топа
-@dp.message(Command("top"))
+@dp.message(F.text.lower() == "🔝топ казино🎰")
 async def gay_top(msg: types.Message):
     top = db.top5_money()
     res = ""
@@ -157,8 +156,8 @@ async def gay_top(msg: types.Message):
 
     await msg.answer(res)
 
-                                                                #функция для просмотра секретной комбинации(админ онли)
-@dp.message(Command("secret"))
+                                                        # функция для просмотра секретной комбинации(админ онли)
+@dp.message(F.text.lower() == "посмотреть секрет")
 async def gay_secret(msg: types.Message):
     if msg.from_user.id in ADMINS:
         await msg.answer("Секрет: " + slots.SECRET)
@@ -166,7 +165,7 @@ async def gay_secret(msg: types.Message):
         await msg.answer("ты недостоин")
 
                                                             #функция для изменения секретной комбинации(админ онли)
-@dp.message(Command("gen"))
+@dp.message(F.text.lower() == "сгенерировать новый секрет")
 async def gay_secret(msg: types.Message):
     if msg.from_user.id in ADMINS:
         slots.secret_regen()
@@ -186,33 +185,114 @@ async def gay_novost(msg: Message,command: CommandObject):
         await msg.answer("ты недостоин")
 
                                                                     #функция для просмотра участников(админ онли)
-@dp.message(Command("spisok"))
-async def gay_spisok(msg: types.Message, command: CommandObject):
+@dp.message(F.text.lower() == "количество участников")
+async def gay_spisok(msg: types.Message):
     schet = 0
     if msg.from_user.id in ADMINS:
-        if command.args is None:
-            await msg.answer("ашипка: выберите что хотите посмотреть\n /spisok kol-vo - для количества игроков\n /spisok people - для вывода всех учащихся")
-            return
-        if command.args == "kol-vo":
             users = db.users_list()
             if not users is None:
                 for u in users:
                     schet+=1
                 await msg.answer(f"количество участников: {schet}")
-        if command.args == "people":
+    else:
+        await msg.answer("ты недостоин")
+
+@dp.message(F.text.lower() == "список участников")
+async def gay_spisok(msg: types.Message):
+    if msg.from_user.id in ADMINS:
             users = db.users_list()
             if not users is None:
                 for u in users:
                     await msg.answer(f"{u.name}")
+    else:
+        await msg.answer("ты недостоин")
 
-@dp.message(Command("admin_help"))
+@dp.message(F.text.lower() == "помощь админам")
 async  def gay_admin_help(msg:types.Message):
     if msg.from_user.id in ADMINS:
         await  msg.answer(ADMIN_HELP)
     else:
         await  msg.answer("ты недостоин")
 
+@dp.message(Command("menu"))
+async def gay_menu(msg: types.Message):
+    kb = [
+        [
+            types.KeyboardButton(text="✨Крутить✨"),
+            types.KeyboardButton(text="💲мега ласт деп💲")
+        ],
+        [
+            types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="👾Профиль👾")
+        ],
+        [
+            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="🔝Топ казино🎰")
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌"),
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать"
+    )
+    await msg.answer("Добро пожаловать, великий додепер",reply_markup=keyboard)
 
+@dp.message(F.text.lower() == "назад")
+async def gay_menu(msg: types.Message):
+    kb = [
+        [
+            types.KeyboardButton(text="✨Крутить✨"),
+            types.KeyboardButton(text="💲мега ласт деп💲")
+        ],
+        [
+            types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="👾Профиль👾")
+        ],
+        [
+            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="🔝Топ казино🎰")
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌"),
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать"
+    )
+    await msg.answer("вы снова простой смертный",reply_markup=keyboard)
+
+@dp.message(F.text.lower() == "📛админ-панель❌")
+async def gay_panel(msg: types.Message):
+    if msg.from_user.id in ADMINS:
+        kb = [
+            [
+                types.KeyboardButton(text="количество участников"),
+                types.KeyboardButton(text="список участников")
+            ],
+            [
+                types.KeyboardButton(text="посмотреть секрет"),
+                types.KeyboardButton(text="сгенерировать новый секрет")
+            ],
+            [
+                types.KeyboardButton(text="помощь админам")
+            ],
+            [
+                types.KeyboardButton(text="назад")
+            ],
+        ]
+        keyboard = types.ReplyKeyboardMarkup(
+            keyboard=kb,
+            resize_keyboard=True,
+            input_field_placeholder="Выберите что хотите сделать"
+        )
+        await msg.answer("Админ панель включена",reply_markup=keyboard)
+    else:
+        await msg.answer("ты недостоин")
 
 async def main():
     print("starting bot..")
