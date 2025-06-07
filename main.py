@@ -238,7 +238,7 @@ async def gay_spisok(msg: types.Message):
             users = db.users_list()
             if not users is None:
                 for u in users:
-                    await msg.answer(f"{u.name}")
+                    await msg.answer(f"{u.name}, {u.id}")
     else:
         await msg.answer("ты недостоин")
 
