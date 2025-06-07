@@ -61,9 +61,9 @@ async def gay_start(msg: types.Message):
         msg.from_user.id,
         ("@" + msg.from_user.username) if not msg.from_user.username is None else msg.from_user.full_name
         ) and dt.add_user(msg.from_user.id):
-        await msg.answer("Регистрация успешна!\n/help - список команд")
+        await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
-        await msg.answer("Регистрация не удалась, поплачь(\n/help - список команд")
+        await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
                                                             #функция для вызыва текста помощи
 @dp.message(F.text.lower() == "🆘помощь🆘")
