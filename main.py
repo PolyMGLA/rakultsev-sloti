@@ -108,6 +108,20 @@ async def gay_spin(msg: types.Message):
     if msgs[0] == "💀💀💀":
         await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
+@dp.message(Command("slots"))
+async def gay_spin(msg: types.Message):
+    msgs = slots.spin(db, dt, msg.from_user.id)
+    for m in msgs:
+        await msg.answer(m)
+    if msgs[0] == slots.SECRET:
+        await send_news(
+            f"{db.get_user(msg.from_user.id).name} - выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        slots.secret_regen()
+    if msgs[0] == "🌈🌈🌈":
+        await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
+    if msgs[0] == "💀💀💀":
+        await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
+
                                                         #функция для получания додепа
 @dp.message(F.text.lower() == "💲мега ласт деп💲")
 async def gay_dodep(msg: types.Message):
