@@ -5,7 +5,6 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
-from aiogram.utils.formatting import Bold
 from games import slots, blackjack
 from db.database import CasinoUsers, CasinoDates
 from datetime import datetime
@@ -74,6 +73,12 @@ async def gay_profile(msg: types.Message):
          + f"\nДодепов: {user.dodep_num}"
         )
 
+#@dp.message(Command("tbgtfiqtbih"))
+#async def gay_tbgtfiqtbih(msg: types.Message):
+#    if msg.from_user.id in ADMINS:
+#        user = db.get_user(msg.from_user.id)
+#        db.update_bal(msg.from_user.id, 0)
+
                                                     #функция для вызова текста правил
 @dp.message(Command("rules"))
 async def gay_ref(msg: types.Message):
@@ -85,7 +90,9 @@ async def gay_spin(msg: types.Message):
     msgs = slots.spin(db, dt, msg.from_user.id)
     for m in msgs:
         await msg.answer(m)
-    
+    if msgs[0] == slots.SECRET:
+        await send_news(f"{db.get_user(msg.from_user.id).name} - выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET+ "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
     if msgs[0] == "💀💀💀":
@@ -94,18 +101,22 @@ async def gay_spin(msg: types.Message):
                                                         #функция для получания додепа
 @dp.message(Command("dodep"))
 async def gay_dodep(msg: types.Message):
-    if dt.get_date(msg.from_user.id) is None:
-        dt.add_user(msg.from_user.id)
+    user = db.get_user(msg.from_user.id)
+    if user.balance<=1:
+        if dt.get_date(msg.from_user.id) is None:
+            dt.add_user(msg.from_user.id)
 
-    tdt = int(datetime.now().timestamp())
-    last_dodep = dt.get_date(msg.from_user.id).date
-    if tdt - last_dodep < 600:
-        await msg.answer(f"подождите {(600 - tdt + last_dodep) // 60} минут {(600 - tdt + last_dodep) % 60} секунд")
-    else:
-        if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(msg.from_user.id, tdt):
-            await msg.answer("додеп прошел")
+        tdt = int(datetime.now().timestamp())
+        last_dodep = dt.get_date(msg.from_user.id).date
+        if tdt - last_dodep < 600:
+            await msg.answer(f"подождите {(600 - tdt + last_dodep) // 60} минут {(600 - tdt + last_dodep) % 60} секунд")
         else:
-            await msg.answer("додеп не прошел")
+            if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(msg.from_user.id, tdt):
+                await msg.answer("додеп прошел")
+            else:
+                await msg.answer("додеп не прошел")
+    else:
+        await msg.answer("вы слишком богатые")
 
                                                         #функция для вызова топа
 @dp.message(Command("top"))

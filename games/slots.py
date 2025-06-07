@@ -54,7 +54,7 @@ def spin(db, dt, id: int) -> str:
     comb = ""
 
     if s == SECRET:
-        newbal += utils.randint(-1000, 1000)
+        newbal += utils.randint(a= -1000,b = 1000)
         comb += "secret; "
 
     match s:
