@@ -128,6 +128,27 @@ async def gay_dodep(msg: types.Message):
     else:
         await msg.answer("вы слишком богатые")
 
+@dp.message(Command("dodep"))
+async def gay_dodep(msg: types.Message):
+    user = db.get_user(msg.from_user.id)
+    if user.balance <= 1:
+        if dt.get_date(msg.from_user.id) is None:
+            dt.add_user(msg.from_user.id)
+
+        tdt = int(datetime.now().timestamp())
+        last_dodep = dt.get_date(msg.from_user.id).date
+        if tdt - last_dodep < 600:
+            await msg.answer(
+                f"подождите {(600 - tdt + last_dodep) // 60} минут {(600 - tdt + last_dodep) % 60} секунд")
+        else:
+            if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(
+                    msg.from_user.id, tdt):
+                await msg.answer("додеп прошел")
+            else:
+                await msg.answer("додеп не прошел")
+    else:
+        await msg.answer("вы слишком богатые")
+
                                                         #функция для вызова топа
 @dp.message(F.text.lower() == "🔝топ казино🎰")
 async def gay_top(msg: types.Message):
