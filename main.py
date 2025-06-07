@@ -28,6 +28,17 @@ HELP = """
 
 Контакты: @ya_blinchik, @Luckich000
 """
+
+ADMIN_HELP = """
+- список команд для админов - 
+/spisok - посмотреть список участников
+/secret - посмотреть секретную комбинацию
+/gen - сгенерировать новую секретку
+/novost - прислать новость для всех участников
+
+доступно только:
+@ya_blinchik, @Luckich000
+"""
                                                                     #дб-шки
 db = CasinoUsers()
 dt = CasinoDates()
@@ -152,7 +163,7 @@ async def gay_secret(msg: types.Message):
     if msg.from_user.id in ADMINS:
         await msg.answer("Секрет: " + slots.SECRET)
     else:
-        await msg.answer("ты не достоин")
+        await msg.answer("ты недостоин")
 
                                                             #функция для изменения секретной комбинации(админ онли)
 @dp.message(Command("gen"))
@@ -161,7 +172,7 @@ async def gay_secret(msg: types.Message):
         slots.secret_regen()
         await msg.answer("Новый секрет: " + slots.SECRET)
     else:
-        await msg.answer("ты не достоин")
+        await msg.answer("ты недостоин")
 
                                                             #функция для создания новостей(админ онли)
 @dp.message(Command("novost"))
@@ -172,7 +183,35 @@ async def gay_novost(msg: Message,command: CommandObject):
             return
         await send_news(command.args)
     else:
-        await msg.answer("ты не достоин")
+        await msg.answer("ты недостоин")
+
+                                                                    #функция для просмотра участников(админ онли)
+@dp.message(Command("spisok"))
+async def gay_spisok(msg: types.Message, command: CommandObject):
+    schet = 0
+    if msg.from_user.id in ADMINS:
+        if command.args is None:
+            await msg.answer("ашипка: выберите что хотите посмотреть\n /spisok kol-vo - для количества игроков\n /spisok people - для вывода всех учащихся")
+            return
+        if command.args == "kol-vo":
+            users = db.users_list()
+            if not users is None:
+                for u in users:
+                    schet+=1
+                await msg.answer(f"количество участников: {schet}")
+        if command.args == "people":
+            users = db.users_list()
+            if not users is None:
+                for u in users:
+                    await msg.answer(f"{u.name}")
+
+@dp.message(Command("admin_help"))
+async  def gay_admin_help(msg:types.Message):
+    if msg.from_user.id in ADMINS:
+        await  msg.answer(ADMIN_HELP)
+    else:
+        await  msg.answer("ты недостоин")
+
 
 
 async def main():
