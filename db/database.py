@@ -161,3 +161,9 @@ class CasinoDates(Base):
                 session.rollback()
                 print(str(e))
                 return False
+            
+
+db = CasinoUsers()
+dt = CasinoDates()
+db.init()
+dt.init()
