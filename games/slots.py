@@ -38,7 +38,6 @@ def _spin(arr: list[str]) -> str:
 def secret_regen():
     global SECRET
     SECRET = _spin(secret_weighted)
-
 secret_regen()
 
 def spin(db, dt, id: int) -> str:

@@ -19,21 +19,17 @@ HELP = """
 - Казино Ракульцев -
 
 /start - регистрация
-/profile - ваш профиль
-/help - помощь
-/rules - правила игр
+/menu - основное меню
 /slots - крутить слоты
 /dodep - додеп
-/top - топ казино
 
 Контакты: @ya_blinchik, @Luckich000
 """
 
 ADMIN_HELP = """
 - список команд для админов - 
-/secret - посмотреть секретную комбинацию
-/gen - сгенерировать новую секретку
-/novost - прислать новость для всех участников
+/novost <новость> - прислать новость для всех участников
+/balance <айди> - посмортеть баланс участника
 
 доступно только:
 @ya_blinchik, @Luckich000
@@ -101,7 +97,7 @@ async def gay_spin(msg: types.Message):
     for m in msgs:
         await msg.answer(m)
     if msgs[0] == slots.SECRET:
-        await send_news(f"{db.get_user(msg.from_user.id).name} - выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET+ "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        await send_news(f"Пользователь {db.get_user(msg.from_user.id).name}  выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET+ "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
@@ -326,6 +322,17 @@ async def gay_panel(msg: types.Message):
             input_field_placeholder="Выберите что хотите сделать"
         )
         await msg.answer("Админ панель включена",reply_markup=keyboard)
+    else:
+        await msg.answer("ты недостоин")
+
+                                                                        #функция просмотра баланса участника
+@dp.message(Command("balance"))
+async def gay_balance(msg: Message,command:CommandObject):
+    if msg.from_user.id in ADMINS:
+        if command.args is None:
+            await msg.answer("ашипка: напишите айди человека\n /balance <айди>")
+            return
+        await msg.answer(f"{db.get_bal(command.args)}")
     else:
         await msg.answer("ты недостоин")
 
