@@ -58,6 +58,9 @@ admin_keyboard = types.ReplyKeyboardMarkup(
             types.KeyboardButton(text="сгенерировать новый секрет")
         ],
         [
+            types.KeyboardButton(text="тестирование")
+        ],
+        [
             types.KeyboardButton(text="помощь админам")
         ],
         [

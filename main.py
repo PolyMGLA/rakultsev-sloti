@@ -13,9 +13,7 @@ from messages import HELP, RULES
 
 from datetime import datetime
 
-
-bot = Bot(config.BOT_TOKEN)
-dp = Dispatcher()
+from bot import bot, dp
 
 
 @dp.message(Command("start"))
@@ -57,7 +55,7 @@ async def gay_profile(msg: types.Message):
 
 
 @dp.message(F.text.lower() == "🔥правила🔥")
-async def gay_ref(msg: types.Message):
+async def gay_rules(msg: types.Message):
     """
     Текст правил всех игр (мне точно надо это писать?)
     """
@@ -92,28 +90,19 @@ async def gay_top(msg: types.Message):
     """
     Топ казино по балансу, круткам слотов и додепам
     """
-    top = db.top5_money()
     res = ""
 
-    res += "Топ по счету:\n"
-    if top == False:
-        res += "ашипка\n\n"
-    else:
-        res += "\n".join([f"{i + 1}. {top[i].name} - {top[i].balance}" for i in range(len(top))]) + "\n\n"
-
-    top = db.top5_slots()
-    res += "Топ по круткам:\n"
-    if top == False:
-        res += "ашипка\n\n"
-    else:
-        res += "\n".join([f"{i + 1}. {top[i].name} - {top[i].slots_num}" for i in range(len(top))]) + "\n\n"
-    
-    top = db.top5_dodeps()
-    res += "Топ по додепам:\n"
-    if top == False:
-        res += "ашипка\n\n"
-    else:
-        res += "\n".join([f"{i + 1}. {top[i].name} - {top[i].dodep_num}" for i in range(len(top))]) + "\n\n"
+    for nom in [
+        [db.top5_money, "счету", "balance"],
+        [db.top5_slots, "круткам", "slots_num"],
+        [db.top5_dodeps, "додепам", "dodep_num"]
+        ]:
+        top = nom[0]()
+        res += f"Топ по {nom[1]}:\n"
+        if top == False:
+            res += "ашипка\n\n"
+        else:
+            res += "\n".join([f"{i + 1}. {top[i].name} - {getattr(top[i], nom[2])}" for i in range(len(top))]) + "\n\n"
 
     await msg.answer(res)
 
@@ -125,7 +114,8 @@ async def gay_menu(msg: types.Message):
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
-    await msg.answer("Добро пожаловать в блекджек", reply_markup=menu_keyboard)
+    # await msg.answer("Добро пожаловать в блекджек", reply_markup=menu_keyboard)
+    await msg.answer("Временно не работает. Here be blackjack.")
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")

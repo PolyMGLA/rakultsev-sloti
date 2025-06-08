@@ -3,9 +3,6 @@ from aiogram import Router, types, F, Bot
 from games import slots
 from db.database import db, dt
 from routes.admins import send_news
-import config
-
-bot = Bot(config.BOT_TOKEN)
 
 router = Router()
 

@@ -1,14 +1,13 @@
 from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, CommandObject
 
-from db.database import db, dt
+from db.database import db
 import config
+from bot import bot
 from messages import ADMIN_HELP
 from games import slots
 
 router = Router()
-
-bot = Bot(config.BOT_TOKEN)
 
 async def send_news(text, exclude: list[int] = []):
     """
@@ -18,7 +17,10 @@ async def send_news(text, exclude: list[int] = []):
     if not users is None:
         for u in users:
             if u.id not in exclude:
-                await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
+                try:
+                    await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
+                except Exception as e:
+                    print(f"sending to {u.id} failed: {e}")
 
 @router.message(F.text.lower() == "посмотреть секрет")
 async def gay_secret_get(msg: types.Message):
