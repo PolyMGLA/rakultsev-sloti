@@ -30,6 +30,7 @@ ADMIN_HELP = """
 - список команд для админов - 
 /novost <новость> - прислать новость для всех участников
 /balance <айди> - посмортеть баланс участника
+/set_balance <id> <chislo> - выдать баланс по id 
 
 доступно только:
 @ya_blinchik, @Luckich000
@@ -97,7 +98,10 @@ async def gay_spin(msg: types.Message):
     for m in msgs:
         await msg.answer(m)
     if msgs[0] == slots.SECRET:
-        await send_news(f"Пользователь {db.get_user(msg.from_user.id).name}  выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET+ "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        await send_news(
+            f"Пользователь {db.get_user(msg.from_user.id).name} выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        slots.secret_regen()
+        slots.secret_regen()
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
@@ -111,7 +115,9 @@ async def gay_spin(msg: types.Message):
         await msg.answer(m)
     if msgs[0] == slots.SECRET:
         await send_news(
-            f"{db.get_user(msg.from_user.id).name} - выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+            f"Пользователь {db.get_user(msg.from_user.id).name} выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+        slots.secret_regen()
+        slots.secret_regen()
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
@@ -249,8 +255,8 @@ async  def gay_admin_help(msg:types.Message):
 async def gay_menu(msg: types.Message):
     kb = [
         [
-            types.KeyboardButton(text="✨Крутить✨"),
-            types.KeyboardButton(text="💲мега ласт деп💲")
+            types.KeyboardButton(text="🎰Cлоты🎰"),
+            types.KeyboardButton(text="♣Блекджек🃏")
         ],
         [
             types.KeyboardButton(text="🔥Правила🔥"),
@@ -271,12 +277,86 @@ async def gay_menu(msg: types.Message):
     )
     await msg.answer("Добро пожаловать, великий додепер",reply_markup=keyboard)
 
-@dp.message(F.text.lower() == "назад")
-async def gay_menu(msg: types.Message):
+@dp.message(F.text.lower() == "♣блекджек🃏")
+async def gay_menu_blackjack(msg: types.Message):
+    kb = [
+        [
+            types.KeyboardButton(text="✨Играть✨")
+        ],
+        [
+            types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="👾Профиль👾")
+        ],
+        [
+            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="🔝Топ казино🎰")
+        ],
+        [
+            types.KeyboardButton(text="🔙Назад🔙"),
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌"),
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать"
+    )
+    await msg.answer("Добро пожаловать в блекджек",reply_markup=keyboard)
+
+@dp.message(F.text.lower() == "🎰cлоты🎰")
+async def gay_menu_slots(msg: types.Message):
     kb = [
         [
             types.KeyboardButton(text="✨Крутить✨"),
             types.KeyboardButton(text="💲мега ласт деп💲")
+        ],
+        [
+            types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="👾Профиль👾")
+        ],
+        [
+            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="🔝Топ казино🎰")
+        ],
+        [
+            types.KeyboardButton(text="🔙Назад🔙"),
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌"),
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать"
+    )
+    await msg.answer("Добро пожаловать в слоты",reply_markup=keyboard)
+
+#@dp.message(F.text.lower() == "✨играть✨")
+#async def gay_menu_slots(msg: types.Message):
+#    kb = [
+#        [
+#            types.KeyboardButton(text="🔙Назад🔙"),
+#        ],
+#        [
+#            types.KeyboardButton(text="📛Админ-панель❌"),
+#        ],
+#    ]
+#    keyboard = types.ReplyKeyboardMarkup(
+#        keyboard=kb,
+#        resize_keyboard=True,
+#        input_field_placeholder="Выберите что хотите сделать"
+#    )
+#    await msg.answer("ещё рано",reply_markup=keyboard)
+
+@dp.message(F.text.lower() == "🔙назад🔙")
+async def gay_back(msg: types.Message):
+    kb = [
+        [
+            types.KeyboardButton(text="🎰Cлоты🎰"),
+            types.KeyboardButton(text="♣Блекджек🃏")
         ],
         [
             types.KeyboardButton(text="🔥Правила🔥"),
@@ -295,7 +375,7 @@ async def gay_menu(msg: types.Message):
         resize_keyboard=True,
         input_field_placeholder="Выберите что хотите сделать"
     )
-    await msg.answer("вы снова простой смертный",reply_markup=keyboard)
+    await msg.answer("Добро пожаловать в меню",reply_markup=keyboard)
 
 @dp.message(F.text.lower() == "📛админ-панель❌")
 async def gay_panel(msg: types.Message):
@@ -313,7 +393,7 @@ async def gay_panel(msg: types.Message):
                 types.KeyboardButton(text="помощь админам")
             ],
             [
-                types.KeyboardButton(text="назад")
+                types.KeyboardButton(text="🔙назад🔙")
             ],
         ]
         keyboard = types.ReplyKeyboardMarkup(
@@ -335,6 +415,106 @@ async def gay_balance(msg: Message,command:CommandObject):
         await msg.answer(f"{db.get_bal(command.args)}")
     else:
         await msg.answer("ты недостоин")
+
+@dp.message(Command("set_balance"))
+async def gay_balance(msg: Message,command:CommandObject):
+    if msg.from_user.id in ADMINS:
+        if command.args is None:
+            await msg.answer(
+                "ашипка: не переданы аргументы"
+            )
+            return
+        try:
+            id, ball = command.args.split(" ", maxsplit=1)
+        except ValueError:
+            await msg.answer(
+                "ашипка: неправильный формат команды. Пример:\n"
+                "/set_balance <id> <chislo>"
+            )
+            return
+        await msg.answer(f"{db.update_bal(id, ball)}")
+    else:
+        await msg.answer("ты недостоин")
+
+
+
+
+user_data = {}
+
+def get_keyboard():
+    buttons = [
+        [
+            types.InlineKeyboardButton(text="-10", callback_data="num_decr10"),
+            types.InlineKeyboardButton(text="-1", callback_data="num_decr"),
+            types.InlineKeyboardButton(text="+1", callback_data="num_incr"),
+            types.InlineKeyboardButton(text="+10", callback_data="num_incr10"),
+        ],
+        [types.InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")]
+    ]
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+async def update_num_text(message: types.Message, new_value: int):
+    await message.edit_text(
+        f"Укажите ставку: {new_value}",
+        reply_markup=get_keyboard()
+    )
+
+
+@dp.message(F.text.lower() == "✨играть✨")
+async def gay_stavka(message: types.Message):
+    user_data[message.from_user.id] = 2
+    await message.answer("Укажите ставку: 2", reply_markup=get_keyboard())
+
+
+@dp.callback_query(F.data.startswith("num_"))
+async def callbacks_num(callback: types.CallbackQuery):
+    user_value = user_data.get(callback.from_user.id, 0)
+    action = callback.data.split("_")[1]
+    if user_value >= 12:
+        if action == "incr":
+            user_data[callback.from_user.id] = user_value+1
+            await update_num_text(callback.message, user_value+1)
+        elif action == "incr10":
+            user_data[callback.from_user.id] = user_value+10
+            await update_num_text(callback.message, user_value+10)
+        elif action == "decr":
+            user_data[callback.from_user.id] = user_value-1
+            await update_num_text(callback.message, user_value-1)
+        elif action == "decr10":
+            user_data[callback.from_user.id] = user_value-10
+            await update_num_text(callback.message, user_value-10)
+
+        elif action == "finish":
+            await callback.message.edit_text(f"Ваша ставка: {user_value}")
+
+        await callback.answer()
+    elif user_value > 2:
+        if action == "incr":
+            user_data[callback.from_user.id] = user_value + 1
+            await update_num_text(callback.message, user_value + 1)
+        elif action == "incr10":
+            user_data[callback.from_user.id] = user_value + 10
+            await update_num_text(callback.message, user_value + 10)
+        elif action == "decr":
+            user_data[callback.from_user.id] = user_value - 1
+            await update_num_text(callback.message, user_value - 1)
+        elif action == "finish":
+            await callback.message.edit_text(f"Ваша ставка: {user_value}")
+        await callback.answer()
+    else:
+        if action == "incr":
+            user_data[callback.from_user.id] = user_value + 1
+            await update_num_text(callback.message, user_value + 1)
+        elif action == "incr10":
+            user_data[callback.from_user.id] = user_value + 10
+            await update_num_text(callback.message, user_value + 10)
+        elif action == "finish":
+            await callback.message.edit_text(f"Ваша ставка: {user_value}")
+        await callback.answer()
+
+
+
 
 async def main():
     print("starting bot..")
