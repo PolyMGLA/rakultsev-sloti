@@ -11,6 +11,7 @@ import routes.blackjack
 from routes.keyboards import *
 import config
 from messages import HELP, RULES
+from middlewares.telegram import TGMiddleWare
 
 from datetime import datetime
 
@@ -23,12 +24,12 @@ async def gay_start(msg: types.Message):
     Регистрация пользователя (попытка зарегать)
     """
     dv.set_date(msg.from_user.id)
-    x = not db.register(
+    x = db.register(
         msg.from_user.id,
         ("@" + msg.from_user.username) if not msg.from_user.username is None else msg.from_user.full_name
         )
-    y = not dt.add_user(msg.from_user.id)
-    z = not dv.add_user(msg.from_user.id)
+    y = dt.add_user(msg.from_user.id)
+    z = dv.add_user(msg.from_user.id)
     if x or y or z:
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
@@ -36,7 +37,7 @@ async def gay_start(msg: types.Message):
 
 
 @dp.message(Command("visitors"))
-async def gay_visitors(msg: types.Message):
+async def gay_visitorsc(msg: types.Message):
     """
     Список пользователей, которые активничали последнюю минуту
     """
@@ -46,6 +47,11 @@ async def gay_visitors(msg: types.Message):
         f"В казино: {len(vis)} человек\n" \
         + "\n".join([f"{el.user.name}" for el in vis])
     )
+
+
+@dp.message(F.text.lower() == "👥посетители👥")
+async def gay_visitors(msg: types.Message):
+    await gay_visitorsc(msg)
 
 
 @dp.message(F.text.lower() == "🆘помощь🆘")
@@ -107,6 +113,11 @@ async def gay_dodep(msg: types.Message):
         await msg.answer("вы слишком богатые")
 
 
+@dp.message(Command("dodep"))
+async def gay_dodepc(msg: types.Message):
+    await gay_dodep(msg)
+
+
 @dp.message(F.text.lower() == "🔝топ казино🎰")
 async def gay_top(msg: types.Message):
     """
@@ -166,6 +177,8 @@ async def gay_panel(msg: types.Message):
 
 async def main():
     print("starting bot..")
+
+    dp.message.middleware(TGMiddleWare())
 
     dp.include_router(routes.slots.router)
     dp.include_router(routes.admins.router)

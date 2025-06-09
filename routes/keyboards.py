@@ -7,7 +7,8 @@ menu_keyboard = types.ReplyKeyboardMarkup(
             types.KeyboardButton(text="♣Блекджек🃏")
         ],
         [
-            types.KeyboardButton(text="🔥Правила🔥"),
+            # types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="👥Посетители👥"),
             types.KeyboardButton(text="👾Профиль👾")
         ],
         [

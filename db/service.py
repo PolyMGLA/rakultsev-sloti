@@ -5,6 +5,9 @@ from sqlalchemy.orm import sessionmaker
 
 from datetime import datetime
 
+import logging
+logger = logging.getLogger(__name__)
+
 from typing import Optional
 
 class UserService:
@@ -21,7 +24,7 @@ class UserService:
             session.commit()
         except Exception as e:
             session.rollback()
-            print(str(e))
+            logger.error(str(e))
         finally:
             session.close()
 
@@ -96,7 +99,7 @@ class DodepService:
             session.commit()
         except Exception as e:
             session.rollback()
-            print(str(e))
+            logger.error(str(e))
         finally:
             session.close()
 
@@ -134,7 +137,7 @@ class VisitorsService:
             session.commit()
         except Exception as e:
             session.rollback()
-            print(str(e))
+            logger.error(str(e))
         finally:
             session.close()
 
@@ -163,4 +166,4 @@ class VisitorsService:
     
     def get_list(self) -> Optional[list[CasinoVisitors]]:
         with self._session_scope() as session:
-            return session.query(CasinoVisitors).where(CasinoVisitors.date >= datetime.now().timestamp() - 60).all()
+            return session.query(CasinoVisitors).where(CasinoVisitors.date >= datetime.now().timestamp() - 300).all()

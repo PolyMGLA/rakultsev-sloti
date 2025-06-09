@@ -1,6 +1,8 @@
 from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, CommandObject
 
+import logging
+
 from db import db, dv
 from routes.keyboards import test_keyboard
 import config
@@ -21,7 +23,7 @@ async def send_news(text, exclude: list[int] = []):
                 try:
                     await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
                 except Exception as e:
-                    print(f"sending to {u.id} failed: {e}")
+                    logging.info(f"sending to {u.id} failed: {e}")
 
 @router.message(F.text.lower() == "посмотреть секрет")
 async def gay_secret_get(msg: types.Message):
