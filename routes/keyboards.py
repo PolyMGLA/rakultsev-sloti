@@ -25,11 +25,36 @@ menu_keyboard = types.ReplyKeyboardMarkup(
 slots_keyboard = types.ReplyKeyboardMarkup(
     keyboard=[
         [
+            types.KeyboardButton(text="✨играть✨"),
+            types.KeyboardButton(text="💲мега ласт деп💲")
+        ],
+        [
+            types.KeyboardButton(text="🔥Правила слотов🔥"),
+            types.KeyboardButton(text="👾Профиль👾")
+        ],
+        [
+            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="🔝Топ казино🎰")
+        ],
+        [
+            types.KeyboardButton(text="🔙Назад🔙"),
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌"),
+        ],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите что хотите сделать"
+)
+
+blackjack_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [
             types.KeyboardButton(text="✨Крутить✨"),
             types.KeyboardButton(text="💲мега ласт деп💲")
         ],
         [
-            types.KeyboardButton(text="🔥Правила🔥"),
+            types.KeyboardButton(text="🔥Правила блэкджека🔥"),
             types.KeyboardButton(text="👾Профиль👾")
         ],
         [

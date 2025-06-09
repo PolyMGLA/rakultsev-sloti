@@ -4,9 +4,10 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 
-from db.database import db, dt
+from db import db, dt, dv
 import routes.slots
 import routes.admins
+import routes.blackjack
 from routes.keyboards import *
 import config
 from messages import HELP, RULES
@@ -21,13 +22,30 @@ async def gay_start(msg: types.Message):
     """
     Регистрация пользователя (попытка зарегать)
     """
-    if db.register(
+    dv.set_date(msg.from_user.id)
+    x = not db.register(
         msg.from_user.id,
         ("@" + msg.from_user.username) if not msg.from_user.username is None else msg.from_user.full_name
-        ) and dt.add_user(msg.from_user.id):
+        )
+    y = not dt.add_user(msg.from_user.id)
+    z = not dv.add_user(msg.from_user.id)
+    if x or y or z:
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
+
+
+@dp.message(Command("visitors"))
+async def gay_visitors(msg: types.Message):
+    """
+    Список пользователей, которые активничали последнюю минуту
+    """
+    dv.set_date(msg.from_user.id)
+    vis = dv.get_list()
+    await msg.answer(
+        f"В казино: {len(vis)} человек\n" \
+        + "\n".join([f"{el.user.name}" for el in vis])
+    )
 
 
 @dp.message(F.text.lower() == "🆘помощь🆘")
@@ -35,6 +53,7 @@ async def gay_help(msg: types.Message):
     """
     Собсна текст помощи утопающим
     """
+    dv.set_date(msg.from_user.id)
     await msg.answer(HELP)
 
 
@@ -43,6 +62,7 @@ async def gay_profile(msg: types.Message):
     """
     Инфо о профиле пользователя
     """
+    dv.set_date(msg.from_user.id)
     user = db.get_user(msg.from_user.id)
     if user is None or user == False:
         await msg.answer("Вы не зарегистрированы!\n/start")
@@ -59,6 +79,7 @@ async def gay_rules(msg: types.Message):
     """
     Текст правил всех игр (мне точно надо это писать?)
     """
+    dv.set_date(msg.from_user.id)
     await msg.answer(RULES)
 
 
@@ -67,6 +88,7 @@ async def gay_dodep(msg: types.Message):
     """
     Функция для пополнения баланса на аккаунте (собственно говоря, додеп)
     """
+    dv.set_date(msg.from_user.id)
     user = db.get_user(msg.from_user.id)
     if user.balance < 2:
         if dt.get_date(msg.from_user.id) is None:
@@ -90,6 +112,7 @@ async def gay_top(msg: types.Message):
     """
     Топ казино по балансу, круткам слотов и додепам
     """
+    dv.set_date(msg.from_user.id)
     res = ""
 
     for nom in [
@@ -99,7 +122,7 @@ async def gay_top(msg: types.Message):
         ]:
         top = nom[0]()
         res += f"Топ по {nom[1]}:\n"
-        if top == False:
+        if top is None:
             res += "ашипка\n\n"
         else:
             res += "\n".join([f"{i + 1}. {top[i].name} - {getattr(top[i], nom[2])}" for i in range(len(top))]) + "\n\n"
@@ -109,105 +132,36 @@ async def gay_top(msg: types.Message):
 
 @dp.message(Command("menu"))
 async def gay_menu(msg: types.Message):
+    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать, великий додепер", reply_markup=menu_keyboard)
 
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
+    dv.set_date(msg.from_user.id)
     # await msg.answer("Добро пожаловать в блекджек", reply_markup=menu_keyboard)
     await msg.answer("Временно не работает. Here be blackjack.")
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")
 async def gay_menu_slots(msg: types.Message):
+    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать в слоты", reply_markup=slots_keyboard)
 
 
 @dp.message(F.text.lower() == "🔙назад🔙")
 async def gay_back(msg: types.Message):
+    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать в меню", reply_markup=menu_keyboard)
 
 
 @dp.message(F.text.lower() == "📛админ-панель❌")
 async def gay_panel(msg: types.Message):
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         await msg.answer("Админ панель включена", reply_markup=admin_keyboard)
     else:
         await msg.answer("ты недостоин")
-
-user_data = {}
-
-def get_keyboard():
-    buttons = [
-        [
-            types.InlineKeyboardButton(text="-10", callback_data="num_decr10"),
-            types.InlineKeyboardButton(text="-1", callback_data="num_decr"),
-            types.InlineKeyboardButton(text="+1", callback_data="num_incr"),
-            types.InlineKeyboardButton(text="+10", callback_data="num_incr10"),
-        ],
-        [types.InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")]
-    ]
-    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
-    return keyboard
-
-async def update_num_text(message: types.Message, new_value: int):
-    await message.edit_text(
-        f"Укажите ставку: {new_value}",
-        reply_markup=get_keyboard()
-    )
-
-
-@dp.message(F.text.lower() == "✨играть✨")
-async def gay_stavka(message: types.Message):
-    user_data[message.from_user.id] = 2
-    await message.answer("Укажите ставку: 2", reply_markup=get_keyboard())
-
-
-@dp.callback_query(F.data.startswith("num_"))
-async def callbacks_num(callback: types.CallbackQuery):
-    user_value = user_data.get(callback.from_user.id, 0)
-    action = callback.data.split("_")[1]
-    if user_value >= 12:
-        if action == "incr":
-            user_data[callback.from_user.id] = user_value+1
-            await update_num_text(callback.message, user_value+1)
-        elif action == "incr10":
-            user_data[callback.from_user.id] = user_value+10
-            await update_num_text(callback.message, user_value+10)
-        elif action == "decr":
-            user_data[callback.from_user.id] = user_value-1
-            await update_num_text(callback.message, user_value-1)
-        elif action == "decr10":
-            user_data[callback.from_user.id] = user_value-10
-            await update_num_text(callback.message, user_value-10)
-
-        elif action == "finish":
-            await callback.message.edit_text(f"Ваша ставка: {user_value}")
-
-        await callback.answer()
-    elif user_value > 2:
-        if action == "incr":
-            user_data[callback.from_user.id] = user_value + 1
-            await update_num_text(callback.message, user_value + 1)
-        elif action == "incr10":
-            user_data[callback.from_user.id] = user_value + 10
-            await update_num_text(callback.message, user_value + 10)
-        elif action == "decr":
-            user_data[callback.from_user.id] = user_value - 1
-            await update_num_text(callback.message, user_value - 1)
-        elif action == "finish":
-            await callback.message.edit_text(f"Ваша ставка: {user_value}")
-        await callback.answer()
-    else:
-        if action == "incr":
-            user_data[callback.from_user.id] = user_value + 1
-            await update_num_text(callback.message, user_value + 1)
-        elif action == "incr10":
-            user_data[callback.from_user.id] = user_value + 10
-            await update_num_text(callback.message, user_value + 10)
-        elif action == "finish":
-            await callback.message.edit_text(f"Ваша ставка: {user_value}")
-        await callback.answer()
 
 
 async def main():
@@ -215,6 +169,7 @@ async def main():
 
     dp.include_router(routes.slots.router)
     dp.include_router(routes.admins.router)
+    dp.include_router(routes.blackjack.router)
 
     await dp.start_polling(bot)
 

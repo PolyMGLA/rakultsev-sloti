@@ -1,7 +1,7 @@
 from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, CommandObject
 
-from db.database import db
+from db import db, dv
 import config
 from bot import bot
 from messages import ADMIN_HELP
@@ -27,6 +27,7 @@ async def gay_secret_get(msg: types.Message):
     """
     [ADMIN ONLY] Просмотр секретной комбинации
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         await msg.answer("Секрет: " + slots.SECRET)
     else:
@@ -38,6 +39,7 @@ async def gay_secret_regen(msg: types.Message):
     """
     [ADMIN ONLY] Генерация новой секретной комбинации
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         slots.secret_regen()
         await msg.answer("Новый секрет: " + slots.SECRET)
@@ -50,6 +52,7 @@ async def gay_novost(msg: types.Message, command: CommandObject):
     """
     [ADMIN ONLY] запостить новость всем пользователям
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         if command.args is None:
             await msg.answer("ашипка: напишите новость\n /novost <новость>")
@@ -64,6 +67,7 @@ async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Вывод количества пользователей казика
     """
+    dv.set_date(msg.from_user.id)
     schet = 0
     if msg.from_user.id in config.ADMINS:
             users = db.users_list()
@@ -83,6 +87,7 @@ async def gay_spisok(msg: types.Message):
 
     TODO: исправить
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
             users = db.users_list()
             if not users is None:
@@ -96,6 +101,7 @@ async def gay_admin_help(msg:types.Message):
     """
     [ADMIN ONLY] ПОМОЩЬ НЕМОЩНЫМ
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         await msg.answer(ADMIN_HELP)
     else:
@@ -106,6 +112,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     """
     [ADMIN ONLY] Просмотр баланса определенного человека
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         if command.args is None:
             await msg.answer("ашипка: напишите айди человека\n /balance <айди>")
@@ -119,6 +126,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     """
     [ADMIN ONLY] Изменение баланса определенного человека
     """
+    dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
         if command.args is None:
             await msg.answer(
