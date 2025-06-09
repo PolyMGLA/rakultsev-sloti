@@ -2,6 +2,7 @@ from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, CommandObject
 
 from db import db, dv
+from routes.keyboards import test_keyboard
 import config
 from bot import bot
 from messages import ADMIN_HELP
@@ -89,10 +90,18 @@ async def gay_spisok(msg: types.Message):
     """
     dv.set_date(msg.from_user.id)
     if msg.from_user.id in config.ADMINS:
-            users = db.users_list()
-            if not users is None:
-                for u in users:
-                    await msg.answer(f"{u.name}, {u.id}")
+        users = db.users_list()
+        if not users is None:
+            for u in users:
+                await msg.answer(f"{u.name}, {u.id}")
+    else:
+        await msg.answer("ты недостоин")
+
+@router.message(F.text.lower() == "тестирование")
+async def gay_beta(msg: types.Message):
+    dv.set_date(msg.from_user.id)
+    if msg.from_user.id in config.ADMINS:
+        await msg.answer("панель тестирования включена", reply_markup=test_keyboard)
     else:
         await msg.answer("ты недостоин")
 

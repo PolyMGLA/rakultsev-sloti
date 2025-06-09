@@ -95,3 +95,19 @@ admin_keyboard = types.ReplyKeyboardMarkup(
     resize_keyboard=True,
     input_field_placeholder="Выберите что хотите сделать"
 )
+
+test_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            types.KeyboardButton(text="✨сосать✨")
+        ],
+        [
+            types.KeyboardButton(text="/visitors")
+        ],
+        [
+            types.KeyboardButton(text="📛Админ-панель❌")
+        ],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите что хотите сделать"
+)

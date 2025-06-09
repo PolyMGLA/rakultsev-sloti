@@ -28,6 +28,7 @@ class UserService:
     def register(self, id: int, name: str) -> bool:
         with self._session_scope() as session:
             session.add(CasinoUsers(id=id, name=name))
+            session.commit()
             return True
         return False
 
@@ -48,6 +49,7 @@ class UserService:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
             user.balance = newbal
+            session.commit()
             return True
         return False
             
@@ -55,6 +57,7 @@ class UserService:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
             user.slots_num += 1
+            session.commit()
             return True
         return False
             
@@ -62,6 +65,7 @@ class UserService:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
             user.dodep_num += 1
+            session.commit()
             return True
         return False
             
@@ -99,6 +103,7 @@ class DodepService:
     def add_user(self, id) -> bool:
         with self._session_scope() as session:
             session.add(CasinoDodepDates(id=id))
+            session.commit()
             return True
         return False
 
@@ -110,6 +115,7 @@ class DodepService:
         with self._session_scope() as session:
             user = session.query(CasinoDodepDates).filter_by(id=id).first()
             user.date = date
+            session.commit()
             return True
         return False
             
@@ -135,6 +141,7 @@ class VisitorsService:
     def add_user(self, id) -> bool:
         with self._session_scope() as session:
             session.add(CasinoVisitors(id=id))
+            session.commit()
             return True
         return False
         
@@ -145,7 +152,12 @@ class VisitorsService:
     def set_date(self, id) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoVisitors).filter_by(id=id).first()
+            if user is None:
+                self.add_user(id)
+                session.commit()
+                user = session.query(CasinoVisitors).filter_by(id=id).first()
             user.date = int(datetime.now().timestamp())
+            session.commit()
             return True
         return False
     
