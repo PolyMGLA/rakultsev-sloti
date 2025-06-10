@@ -5,9 +5,10 @@ from games import slots
 from db import db, dt, dv, dg, utils
 from routes.admins import send_news
 from games.slots import RULES
+from middlewares.telegram import TGMiddleWare
 
 router = Router()
-
+router.message.middleware(TGMiddleWare())
 
 @router.message(
     or_f(
@@ -34,10 +35,10 @@ async def gay_spin(msg: types.Message):
         slots.secret_regen()
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
-        dg.add_gift(msg.from_user.id, "🌈Игрушечная радуга", "absolute sigma")
+        dg.add_gift(msg.from_user.id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
     if msgs[0] == "💀💀💀":
-        dg.add_gift(msg.from_user.id, "💀Игрушечный череп", "проиграл все")
+        dg.add_gift(msg.from_user.id, "dead", "💀Игрушечный череп", "проиграл все")
         await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
 

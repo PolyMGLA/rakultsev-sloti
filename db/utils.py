@@ -38,5 +38,5 @@ def profile(id: int):
             + f"\nДодепов: {user.dodep_num}" \
             + f"\n\n- Подарков: {len(gifts)} -\n" \
             + "\n".join(
-                f"{el.gift_type} #{el.gift_id} - \"{el.descr}\"" for el in gifts
+                f"{el.gift_name} #{el.gift_id} - \"{el.descr}\"" for el in gifts
             )

@@ -56,5 +56,6 @@ class CasinoGifts(Base):
     gift_id = Column("gift_id", Integer, primary_key=True)
     user_id = Column("user_id", Integer, ForeignKey("users.id"))
     gift_type = Column("gift_type", String, nullable=False)
+    gift_name = Column("gift_name", String, nullable=False)
     descr = Column("descr", String, default="")
     user = relationship("CasinoUsers", back_populates="gifts", lazy="joined")

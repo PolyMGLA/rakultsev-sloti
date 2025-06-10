@@ -220,9 +220,9 @@ class GiftsService:
             return session.query(CasinoGifts).filter_by(user_id=user_id).all()
         return []
     
-    def add_gift(self, user_id: int, gift_type: str, descr: str = "") -> bool:
+    def add_gift(self, user_id: int, gift_type: str, gift_name: str, descr: str = "") -> bool:
         with self._session_scope() as session:
-            session.add(CasinoGifts(user_id=user_id, gift_type=gift_type, descr=descr))
+            session.add(CasinoGifts(user_id=user_id, gift_type=gift_type, gift_name=gift_name, descr=descr))
             session.commit()
             return True
         return False

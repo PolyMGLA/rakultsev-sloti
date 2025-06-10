@@ -8,6 +8,7 @@ from db import db, dt, dv, dg, utils
 import routes.slots
 import routes.admins
 import routes.blackjack
+import routes.shop
 from routes.keyboards import *
 import config
 from messages import HELP, RULES
@@ -139,7 +140,6 @@ async def gay_menu(msg: types.Message):
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
-    # await msg.answer("Добро пожаловать в блекджек", reply_markup=menu_keyboard)
     await msg.answer("Временно не работает. Here be blackjack.")
 
 
@@ -153,15 +153,6 @@ async def gay_back(msg: types.Message):
     await msg.answer("Добро пожаловать в меню", reply_markup=menu_keyboard)
 
 
-@dp.message(F.text.lower() == "📛админ-панель❌")
-async def gay_panel(msg: types.Message):
-    dv.set_date(msg.from_user.id)
-    if msg.from_user.id in config.ADMINS:
-        await msg.answer("Админ панель включена", reply_markup=admin_keyboard)
-    else:
-        await msg.answer("ты недостоин")
-
-
 async def main():
     print("starting bot..")
 
@@ -170,6 +161,7 @@ async def main():
     dp.include_router(routes.admins.router)
     dp.include_router(routes.slots.router)
     dp.include_router(routes.blackjack.router)
+    dp.include_router(routes.shop.router)
 
     await dp.start_polling(bot)
 
