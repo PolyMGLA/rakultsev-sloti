@@ -1,10 +1,10 @@
-                                                                    #импорт всякой залупы
+# импорт всякой залупы
 import asyncio
 
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command, or_f
+from aiogram.filters import Command, or_f, CommandObject
 
-from db import db, dt, dv, utils
+from db import db, dt, dv, dg, utils
 import routes.slots
 import routes.admins
 import routes.blackjack
@@ -30,7 +30,7 @@ async def gay_start(msg: types.Message):
     """
     Регистрация пользователя (попытка зарегать)
     """
-    
+
     if utils.init_user(msg):
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
@@ -44,8 +44,7 @@ async def gay_visitors(msg: types.Message):
     """
     vis = dv.get_list()
     await msg.answer(
-        f"В казино: {len(vis)} человек\n" \
-        + "\n".join([f"{el.user.name}" for el in vis])
+        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.user.name}" for el in vis])
     )
 
 
@@ -62,16 +61,7 @@ async def gay_profile(msg: types.Message):
     """
     Инфо о профиле пользователя
     """
-    user = db.get_user(msg.from_user.id)
-    if user is None or user == False:
-        await msg.answer("Вы не зарегистрированы!\n/start")
-    else:
-        await msg.answer(
-            f"Пользователь: {user.name}"
-            + f"\nБаланс: {user.balance}" + (" (вы в долгах)" if user.balance < 0 else "")
-            + f"\nКруток слотов: {user.slots_num}"
-            + f"\nДодепов: {user.dodep_num}"
-        )
+    await msg.answer(utils.profile(msg.from_user.id))
 
 
 @dp.message(F.text.lower() == "🔥правила🔥")
@@ -96,9 +86,15 @@ async def gay_dodep(msg: types.Message):
         last_dodep = dt.get_date(msg.from_user.id).date
         timeout = 600 - 10 * db.get_bal(msg.from_user.id)
         if tdt - last_dodep < timeout:
-            await msg.answer(f"подождите {(timeout - tdt + last_dodep) // 60} минут {(timeout - tdt + last_dodep) % 60} секунд")
+            await msg.answer(
+                f"подождите {(timeout - tdt + last_dodep) // 60} минут {(timeout - tdt + last_dodep) % 60} секунд"
+            )
         else:
-            if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(msg.from_user.id, tdt):
+            if (
+                db.update_bal(msg.from_user.id, 100)
+                and db.add_dodep(msg.from_user.id)
+                and dt.set_date(msg.from_user.id, tdt)
+            ):
                 await msg.answer("додеп прошел")
             else:
                 await msg.answer("додеп не прошел")
@@ -116,14 +112,22 @@ async def gay_top(msg: types.Message):
     for nom in [
         [db.top5_money, "счету", "balance"],
         [db.top5_slots, "круткам", "slots_num"],
-        [db.top5_dodeps, "додепам", "dodep_num"]
-        ]:
+        [db.top5_dodeps, "додепам", "dodep_num"],
+    ]:
         top = nom[0]()
         res += f"Топ по {nom[1]}:\n"
         if top is None:
             res += "ашипка\n\n"
         else:
-            res += "\n".join([f"{i + 1}. {top[i].name} - {getattr(top[i], nom[2])}" for i in range(len(top))]) + "\n\n"
+            res += (
+                "\n".join(
+                    [
+                        f"{i + 1}. {top[i].name} - {getattr(top[i], nom[2])}"
+                        for i in range(len(top))
+                    ]
+                )
+                + "\n\n"
+            )
 
     await msg.answer(res)
 
@@ -163,8 +167,8 @@ async def main():
 
     dp.message.middleware(TGMiddleWare())
 
-    dp.include_router(routes.slots.router)
     dp.include_router(routes.admins.router)
+    dp.include_router(routes.slots.router)
     dp.include_router(routes.blackjack.router)
 
     await dp.start_polling(bot)

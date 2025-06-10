@@ -3,7 +3,7 @@ from aiogram.filters import Command, CommandObject
 
 import logging
 
-from db import db, dv
+from db import db, dv, utils
 from routes.keyboards import test_keyboard
 import config
 from bot import bot
@@ -11,6 +11,7 @@ from messages import ADMIN_HELP
 from games import slots
 
 router = Router()
+
 
 async def send_news(text, exclude: list[int] = []):
     """
@@ -24,6 +25,7 @@ async def send_news(text, exclude: list[int] = []):
                     await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
                 except Exception as e:
                     logging.info(f"sending to {u.id} failed: {e}")
+
 
 @router.message(F.text.lower() == "посмотреть секрет")
 async def gay_secret_get(msg: types.Message):
@@ -67,21 +69,19 @@ async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Вывод количества пользователей казика
     """
-    schet = 0
     if msg.from_user.id in config.ADMINS:
-            users = db.users_list()
-            if not users is None:
-                for u in users:
-                    schet+=1
-                await msg.answer(f"количество участников: {schet}")
+        users = db.users_list()
+        if not users is None:
+            await msg.answer(f"количество участников: {len(users)}")
     else:
         await msg.answer("ты недостоин")
+
 
 @router.message(F.text.lower() == "список участников")
 async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Отправка списка всех участников.
-    
+
     ВАЖНО! Отправляется каждый в отдельном сообщении, возможна ошибка отправки части из них вследствие большого кол-ва сообщений в минуту
 
     TODO: исправить
@@ -94,6 +94,7 @@ async def gay_spisok(msg: types.Message):
     else:
         await msg.answer("ты недостоин")
 
+
 @router.message(F.text.lower() == "тестирование")
 async def gay_beta(msg: types.Message):
     if msg.from_user.id in config.ADMINS:
@@ -101,8 +102,9 @@ async def gay_beta(msg: types.Message):
     else:
         await msg.answer("ты недостоин")
 
+
 @router.message(F.text.lower() == "помощь админам")
-async def gay_admin_help(msg:types.Message):
+async def gay_admin_help(msg: types.Message):
     """
     [ADMIN ONLY] ПОМОЩЬ НЕМОЩНЫМ
     """
@@ -110,6 +112,7 @@ async def gay_admin_help(msg:types.Message):
         await msg.answer(ADMIN_HELP)
     else:
         await msg.answer("ты недостоин")
+
 
 @router.message(Command("balance"))
 async def gay_balance(msg: types.Message, command: CommandObject):
@@ -124,6 +127,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     else:
         await msg.answer("ты недостоин")
 
+
 @router.message(Command("set_balance"))
 async def gay_balance(msg: types.Message, command: CommandObject):
     """
@@ -131,9 +135,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     """
     if msg.from_user.id in config.ADMINS:
         if command.args is None:
-            await msg.answer(
-                "ашипка: не переданы аргументы"
-            )
+            await msg.answer("ашипка: не переданы аргументы")
             return
         try:
             id, ball = command.args.split(" ", maxsplit=1)
@@ -144,5 +146,20 @@ async def gay_balance(msg: types.Message, command: CommandObject):
             )
             return
         await msg.answer(f"{db.update_bal(id, ball)}")
+    else:
+        await msg.answer("ты недостоин")
+
+
+@router.message(Command("user"))
+async def gay_profile(msg: types.Message, command: CommandObject):
+    """
+    Инфо о профиле пользователя
+    """
+    if msg.from_user.id in config.ADMINS:
+        if command.args == "":
+            await msg.answer("Введите команду в формате /user <id>")
+        else:
+            msgid = int(command.args)
+            await msg.answer(utils.profile(msgid))
     else:
         await msg.answer("ты недостоин")

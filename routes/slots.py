@@ -2,13 +2,20 @@ from aiogram import Router, types, F, Bot
 from aiogram.filters import Command, or_f
 
 from games import slots
-from db import db, dt, dv, utils
+from db import db, dt, dv, dg, utils
 from routes.admins import send_news
 from games.slots import RULES
 
 router = Router()
 
-@router.message(or_f(F.text.lower() == "✨играть✨", Command("slots")))
+
+@router.message(
+    or_f(
+        F.text.lower() == "✨крутить✨",
+        F.text.lower() == "✨играть✨",
+        Command("slots"),
+    )
+)
 async def gay_spin(msg: types.Message):
     """
     Крутим жоска
@@ -18,13 +25,19 @@ async def gay_spin(msg: types.Message):
         await msg.answer(m)
     if msgs[0] == slots.SECRET:
         await send_news(
-            f"Пользователь {db.get_user(msg.from_user.id).name} выбил секретную комбинацию!!\n" + "прошлое комбо:" + slots.SECRET + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- ")
+            f"Пользователь {db.get_user(msg.from_user.id).name} выбил секретную комбинацию!!\n"
+            + "прошлое комбо:"
+            + slots.SECRET
+            + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- "
+        )
         slots.secret_regen()
         slots.secret_regen()
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
+        dg.add_gift(msg.from_user.id, "🌈Игрушечная радуга", "absolute sigma")
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
     if msgs[0] == "💀💀💀":
+        dg.add_gift(msg.from_user.id, "💀Игрушечный череп", "проиграл все")
         await send_news(f"{db.get_user(msg.from_user.id).name} проиграл семью в казино")
 
 

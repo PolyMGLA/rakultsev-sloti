@@ -19,9 +19,9 @@ RULES = """
 Играть: /slots
 """
 
-fruits =  ["🍓", "🍌", "🍒", "🍍", "🍑", "🌈", "💀"]
-weights = [10,   15,   9,    8,    10,   1,    1   ]
-secrw =   [3,    2,    1,    3,    2,    5,    5  ]
+fruits = ["🍓", "🍌", "🍒", "🍍", "🍑", "🌈", "💀"]
+weights = [10, 15, 9, 8, 10, 1, 1]
+secrw = [3, 2, 1, 3, 2, 5, 5]
 
 fruits_weighted = []
 for i in range(7):
@@ -31,6 +31,7 @@ secret_weighted = []
 for i in range(7):
     secret_weighted += [fruits[i]] * secrw[i]
 
+
 def _spin(arr: list[str]) -> str:
     return "".join(utils.choice(arr) for i in range(3))
 
@@ -38,7 +39,10 @@ def _spin(arr: list[str]) -> str:
 def secret_regen():
     global SECRET
     SECRET = _spin(secret_weighted)
+
+
 secret_regen()
+
 
 def spin(db, dt, id: int) -> str:
     global SECRET
@@ -53,7 +57,7 @@ def spin(db, dt, id: int) -> str:
     comb = ""
 
     if s == SECRET:
-        newbal += utils.randint(a= -1000,b = 1000)
+        newbal += utils.randint(a=-1000, b=1000)
         comb += "secret; "
 
     match s:
@@ -97,7 +101,8 @@ def spin(db, dt, id: int) -> str:
             if s.count("💀") == 2:
                 newbal -= 100
                 comb += "2 черепа; "
-    if not comb: comb = "ничего"
+    if not comb:
+        comb = "ничего"
     if db.update_bal(id, newbal) and db.add_slot(id):
         # if newbal < 0:
         #     dt.set_date(id, dt.get_date(id).date - 10 * newbal)

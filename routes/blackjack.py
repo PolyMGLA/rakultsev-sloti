@@ -4,6 +4,7 @@ router = Router()
 
 user_data = {}
 
+
 def get_keyboard():
     buttons = [
         [
@@ -12,16 +13,14 @@ def get_keyboard():
             types.InlineKeyboardButton(text="+1", callback_data="num_incr"),
             types.InlineKeyboardButton(text="+10", callback_data="num_incr10"),
         ],
-        [types.InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")]
+        [types.InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")],
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 
+
 async def update_num_text(message: types.Message, new_value: int):
-    await message.edit_text(
-        f"Укажите ставку: {new_value}",
-        reply_markup=get_keyboard()
-    )
+    await message.edit_text(f"Укажите ставку: {new_value}", reply_markup=get_keyboard())
 
 
 @router.message(F.text.lower() == "✨сосать✨")
@@ -36,17 +35,17 @@ async def callbacks_num(callback: types.CallbackQuery):
     action = callback.data.split("_")[1]
     if user_value >= 12:
         if action == "incr":
-            user_data[callback.from_user.id] = user_value+1
-            await update_num_text(callback.message, user_value+1)
+            user_data[callback.from_user.id] = user_value + 1
+            await update_num_text(callback.message, user_value + 1)
         elif action == "incr10":
-            user_data[callback.from_user.id] = user_value+10
-            await update_num_text(callback.message, user_value+10)
+            user_data[callback.from_user.id] = user_value + 10
+            await update_num_text(callback.message, user_value + 10)
         elif action == "decr":
-            user_data[callback.from_user.id] = user_value-1
-            await update_num_text(callback.message, user_value-1)
+            user_data[callback.from_user.id] = user_value - 1
+            await update_num_text(callback.message, user_value - 1)
         elif action == "decr10":
-            user_data[callback.from_user.id] = user_value-10
-            await update_num_text(callback.message, user_value-10)
+            user_data[callback.from_user.id] = user_value - 10
+            await update_num_text(callback.message, user_value - 10)
 
         elif action == "finish":
             await callback.message.edit_text(f"Ваша ставка: {user_value}")
