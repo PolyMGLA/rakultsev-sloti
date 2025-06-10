@@ -31,7 +31,6 @@ class CasinoUsers(Base):
     gifts = relationship(
         "CasinoGifts",
         back_populates="user",
-        uselist=False,
         cascade="all, delete-orphan",
         lazy="joined",
     )

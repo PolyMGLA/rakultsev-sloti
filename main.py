@@ -1,16 +1,15 @@
 # импорт всякой залупы
 import asyncio
 
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command, or_f, CommandObject
+from aiogram import types, F
+from aiogram.filters import Command, or_f
 
-from db import db, dt, dv, dg, utils
+from db import db, dt, dv, utils
 import routes.slots
 import routes.admins
 import routes.blackjack
 import routes.shop
 from routes.keyboards import *
-import config
 from messages import HELP, RULES
 from middlewares.telegram import TGMiddleWare
 

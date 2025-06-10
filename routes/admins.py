@@ -1,10 +1,9 @@
 from aiogram import Router, types, F
 from aiogram.filters import Command, CommandObject
 
-import logging
-
 from db import db, dg, utils
 from routes.keyboards import test_keyboard, admin_keyboard
+from routes.utils import send_news
 from bot import bot
 from messages import ADMIN_HELP
 from games import slots
@@ -13,20 +12,6 @@ from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
 router = Router()
 router.message.middleware(TGMiddleWare())
 router.message.middleware(TGAdminMiddleWare())
-
-
-async def send_news(text, exclude: list[int] = []):
-    """
-    Отправка новостей всем пользователям, за исключением списка exclude (аргумент опциональный)
-    """
-    users = db.users_list()
-    if not users is None:
-        for u in users:
-            if u.id not in exclude:
-                try:
-                    await bot.send_message(u.id, "- НОВОСТЬ ОТ АДМИНА -\n" + text)
-                except Exception as e:
-                    logging.info(f"sending to {u.id} failed: {e}")
 
 
 @router.message(F.text.lower() == "📛админ-панель❌")

@@ -260,3 +260,10 @@ class GiftsService:
             session.query(CasinoGifts).where(CasinoGifts.gift_id == gift_id).delete()
             return True
         return False
+
+
+    def has_gift(self, user_id: int, gift_type: str) -> bool:
+        gifts = self.get_user_gifts(user_id)
+        for g in gifts:
+            if g.gift_type == gift_type: return True
+        return False

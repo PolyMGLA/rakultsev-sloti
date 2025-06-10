@@ -1,5 +1,5 @@
 from games import utils
-from datetime import datetime
+from routes.utils import send_news
 
 RULES = """
 - Правила игры в Слоты -
@@ -44,21 +44,26 @@ def secret_regen():
 secret_regen()
 
 
-def spin(db, dt, id: int) -> str:
+async def spin(db, dg, id: int) -> str:
     global SECRET
 
     s = _spin(fruits_weighted)
     bal = db.get_bal(id)
-    if db.get_user(id) == False:
-        return ["Вы еще не зарегистрированы!\n/start"]
-    if bal < 2:
-        return ["Недостаточно денег.\nБез додепа не разобраться\n /dodep"]
     newbal = bal - 2
     comb = ""
 
     if s == SECRET:
         newbal += utils.randint(a=-1000, b=1000)
         comb += "secret; "
+        await send_news(
+            f"Пользователь {db.get_user(id).name} выбил секретную комбинацию!!\n"
+            + "прошлое комбо:"
+            + SECRET
+            + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- "
+        )
+        secret_regen()
+        secret_regen()
+        secret_regen()
 
     match s:
         case "🍌🍌🍌":
@@ -79,9 +84,13 @@ def spin(db, dt, id: int) -> str:
         case "🌈🌈🌈":
             newbal += 999
             comb = "Absolute cinema"
+            dg.add_gift(id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
+            await send_news(f"{db.get_user(id).name} - absolute sigma!!")
         case "💀💀💀":
             newbal -= 5000
             comb = "Вы проиграли хату"
+            dg.add_gift(id, "dead", "💀Игрушечный череп", "проиграл все")
+            await send_news(f"{db.get_user(id).name} проиграл семью в казино")
         case "🍌🍑🍌":
             newbal += utils.randint(-50, 50)
             comb = "Пайпер Перри..?"
@@ -104,8 +113,6 @@ def spin(db, dt, id: int) -> str:
     if not comb:
         comb = "ничего"
     if db.update_bal(id, newbal) and db.add_slot(id):
-        # if newbal < 0:
-        #     dt.set_date(id, dt.get_date(id).date - 10 * newbal)
         return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

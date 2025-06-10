@@ -100,17 +100,3 @@ test_keyboard = types.ReplyKeyboardMarkup(
     resize_keyboard=True,
     input_field_placeholder="Выберите что хотите сделать",
 )
-
-shop_keyboard = types.ReplyKeyboardMarkup(
-    keyboard=[
-        [types.KeyboardButton(text="💲мега ласт деп💲")],
-        [
-            types.KeyboardButton(text="🪙воздух🌪️ (0🪙)"),
-            types.KeyboardButton(text="🪙кубок лудомана🏆 (150🪙, Limited)")
-        ],
-        [types.KeyboardButton(text="💸Донат админам💸")],
-        [types.KeyboardButton(text="🔙Назад🔙")],
-    ],
-    resize_keyboard=True,
-    input_field_placeholder="Выберите что хотите сделать",
-)
