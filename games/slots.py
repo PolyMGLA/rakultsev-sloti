@@ -76,9 +76,8 @@ def spin(db, dt, id: int) -> str:
             newbal += 999
             comb = "Absolute cinema"
         case "💀💀💀":
-            newbal = 0
+            newbal -= 5000
             comb = "Вы проиграли хату"
-            dt.set_date(id, int(datetime.now().timestamp()) + 60 * 60 * 5)
         case "🍌🍑🍌":
             newbal += utils.randint(-50, 50)
             comb = "Пайпер Перри..?"
@@ -100,8 +99,8 @@ def spin(db, dt, id: int) -> str:
                 comb += "2 черепа; "
     if not comb: comb = "ничего"
     if db.update_bal(id, newbal) and db.add_slot(id):
-        if newbal < 0:
-            dt.set_date(id, dt.get_date(id).date + 10 * abs(newbal))
+        # if newbal < 0:
+        #     dt.set_date(id, dt.get_date(id).date - 10 * newbal)
         return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

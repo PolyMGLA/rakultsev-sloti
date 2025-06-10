@@ -30,6 +30,7 @@ class UserService:
 
     def register(self, id: int, name: str) -> bool:
         with self._session_scope() as session:
+            if not self.get_user(id) is None: return False
             session.add(CasinoUsers(id=id, name=name))
             session.commit()
             return True
@@ -105,6 +106,7 @@ class DodepService:
 
     def add_user(self, id) -> bool:
         with self._session_scope() as session:
+            if not self.get_date(id) is None: return False
             session.add(CasinoDodepDates(id=id))
             session.commit()
             return True
@@ -143,6 +145,7 @@ class VisitorsService:
 
     def add_user(self, id) -> bool:
         with self._session_scope() as session:
+            if not self.get_date(id) is None: return False
             session.add(CasinoVisitors(id=id))
             session.commit()
             return True

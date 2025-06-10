@@ -2,9 +2,9 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
+from aiogram.filters import Command, or_f
 
-from db import db, dt, dv
+from db import db, dt, dv, utils
 import routes.slots
 import routes.admins
 import routes.blackjack
@@ -17,31 +17,31 @@ from datetime import datetime
 
 from bot import bot, dp
 
+"""
+TODO:
+Блэкджек
+Магазин
+Кредиты в магазине (берешь кредит на несколько дней/недель, по окончанию срока должен выплатить сумму кредита, иначе через 3 дня на счет начислится минус с большим коэффициентом)
+"""
+
 
 @dp.message(Command("start"))
 async def gay_start(msg: types.Message):
     """
     Регистрация пользователя (попытка зарегать)
     """
-    dv.set_date(msg.from_user.id)
-    x = db.register(
-        msg.from_user.id,
-        ("@" + msg.from_user.username) if not msg.from_user.username is None else msg.from_user.full_name
-        )
-    y = dt.add_user(msg.from_user.id)
-    z = dv.add_user(msg.from_user.id)
-    if x or y or z:
+    
+    if utils.init_user(msg):
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
 
-@dp.message(Command("visitors"))
-async def gay_visitorsc(msg: types.Message):
+@dp.message(or_f(F.text.lower() == "👥посетители👥", Command("visitors")))
+async def gay_visitors(msg: types.Message):
     """
     Список пользователей, которые активничали последнюю минуту
     """
-    dv.set_date(msg.from_user.id)
     vis = dv.get_list()
     await msg.answer(
         f"В казино: {len(vis)} человек\n" \
@@ -49,34 +49,28 @@ async def gay_visitorsc(msg: types.Message):
     )
 
 
-@dp.message(F.text.lower() == "👥посетители👥")
-async def gay_visitors(msg: types.Message):
-    await gay_visitorsc(msg)
-
-
-@dp.message(F.text.lower() == "🆘помощь🆘")
+@dp.message(or_f(F.text.lower() == "🆘помощь🆘", Command("help")))
 async def gay_help(msg: types.Message):
     """
     Собсна текст помощи утопающим
     """
-    dv.set_date(msg.from_user.id)
     await msg.answer(HELP)
 
 
-@dp.message(F.text.lower() == "👾профиль👾")
+@dp.message(or_f(F.text.lower() == "👾профиль👾", Command("profile")))
 async def gay_profile(msg: types.Message):
     """
     Инфо о профиле пользователя
     """
-    dv.set_date(msg.from_user.id)
     user = db.get_user(msg.from_user.id)
     if user is None or user == False:
         await msg.answer("Вы не зарегистрированы!\n/start")
-    await msg.answer(
-        f"Пользователь: {user.name}"
-         + f"\nБаланс: {user.balance}" + (" (вы в долгах)" if user.balance < 0 else "")
-         + f"\nКруток слотов: {user.slots_num}"
-         + f"\nДодепов: {user.dodep_num}"
+    else:
+        await msg.answer(
+            f"Пользователь: {user.name}"
+            + f"\nБаланс: {user.balance}" + (" (вы в долгах)" if user.balance < 0 else "")
+            + f"\nКруток слотов: {user.slots_num}"
+            + f"\nДодепов: {user.dodep_num}"
         )
 
 
@@ -84,26 +78,25 @@ async def gay_profile(msg: types.Message):
 async def gay_rules(msg: types.Message):
     """
     Текст правил всех игр (мне точно надо это писать?)
+
+    P.s. Удалено из меню
     """
-    dv.set_date(msg.from_user.id)
     await msg.answer(RULES)
 
 
-@dp.message(F.text.lower() == "💲мега ласт деп💲")
+@dp.message(or_f(F.text.lower() == "💲мега ласт деп💲", Command("dodep")))
 async def gay_dodep(msg: types.Message):
     """
     Функция для пополнения баланса на аккаунте (собственно говоря, додеп)
     """
-    dv.set_date(msg.from_user.id)
     user = db.get_user(msg.from_user.id)
     if user.balance < 2:
-        if dt.get_date(msg.from_user.id) is None:
-            dt.add_user(msg.from_user.id)
 
         tdt = int(datetime.now().timestamp())
         last_dodep = dt.get_date(msg.from_user.id).date
-        if tdt - last_dodep < 600:
-            await msg.answer(f"подождите {(600 - tdt + last_dodep) // 60} минут {(600 - tdt + last_dodep) % 60} секунд")
+        timeout = 600 - 10 * db.get_bal(msg.from_user.id)
+        if tdt - last_dodep < timeout:
+            await msg.answer(f"подождите {(timeout - tdt + last_dodep) // 60} минут {(timeout - tdt + last_dodep) % 60} секунд")
         else:
             if db.update_bal(msg.from_user.id, 100) and db.add_dodep(msg.from_user.id) and dt.set_date(msg.from_user.id, tdt):
                 await msg.answer("додеп прошел")
@@ -113,17 +106,11 @@ async def gay_dodep(msg: types.Message):
         await msg.answer("вы слишком богатые")
 
 
-@dp.message(Command("dodep"))
-async def gay_dodepc(msg: types.Message):
-    await gay_dodep(msg)
-
-
-@dp.message(F.text.lower() == "🔝топ казино🎰")
+@dp.message(or_f(F.text.lower() == "🔝топ казино🎰", Command("top")))
 async def gay_top(msg: types.Message):
     """
     Топ казино по балансу, круткам слотов и додепам
     """
-    dv.set_date(msg.from_user.id)
     res = ""
 
     for nom in [
@@ -143,26 +130,22 @@ async def gay_top(msg: types.Message):
 
 @dp.message(Command("menu"))
 async def gay_menu(msg: types.Message):
-    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать, великий додепер", reply_markup=menu_keyboard)
 
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
-    dv.set_date(msg.from_user.id)
     # await msg.answer("Добро пожаловать в блекджек", reply_markup=menu_keyboard)
     await msg.answer("Временно не работает. Here be blackjack.")
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")
 async def gay_menu_slots(msg: types.Message):
-    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать в слоты", reply_markup=slots_keyboard)
 
 
 @dp.message(F.text.lower() == "🔙назад🔙")
 async def gay_back(msg: types.Message):
-    dv.set_date(msg.from_user.id)
     await msg.answer("Добро пожаловать в меню", reply_markup=menu_keyboard)
 
 
