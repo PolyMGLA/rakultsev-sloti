@@ -10,6 +10,7 @@ from middlewares.telegram import TGMiddleWare
 router = Router()
 router.message.middleware(TGMiddleWare())
 
+
 @router.message(
     or_f(
         F.text.lower() == "✨крутить✨",
@@ -35,7 +36,9 @@ async def gay_spin(msg: types.Message):
         slots.secret_regen()
         slots.secret_regen()
     if msgs[0] == "🌈🌈🌈":
-        dg.add_gift(msg.from_user.id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
+        dg.add_gift(
+            msg.from_user.id, "rainbow", "🌈Игрушечная радуга", "absolute sigma"
+        )
         await send_news(f"{db.get_user(msg.from_user.id).name} - absolute sigma!!")
     if msgs[0] == "💀💀💀":
         dg.add_gift(msg.from_user.id, "dead", "💀Игрушечный череп", "проиграл все")

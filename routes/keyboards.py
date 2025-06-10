@@ -7,15 +7,15 @@ menu_keyboard = types.ReplyKeyboardMarkup(
             types.KeyboardButton(text="♣Блекджек🃏"),
         ],
         [
-            # types.KeyboardButton(text="🔥Правила🔥"),
             types.KeyboardButton(text="👥Посетители👥"),
             types.KeyboardButton(text="👾Профиль👾"),
         ],
         [
-            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="💸магазин💸"),
             types.KeyboardButton(text="🔝Топ казино🎰"),
         ],
         [
+            types.KeyboardButton(text="🆘Помощь🆘"),
             types.KeyboardButton(text="📛Админ-панель❌"),
         ],
     ],
@@ -104,7 +104,10 @@ test_keyboard = types.ReplyKeyboardMarkup(
 shop_keyboard = types.ReplyKeyboardMarkup(
     keyboard=[
         [types.KeyboardButton(text="💲мега ласт деп💲")],
-        [types.KeyboardButton(text="🪙купить воздух🪙")],
+        [
+            types.KeyboardButton(text="🪙воздух🌪️ (0🪙)"),
+            types.KeyboardButton(text="🪙кубок лудомана🏆 (150🪙, Limited)")
+        ],
         [types.KeyboardButton(text="💸Донат админам💸")],
         [types.KeyboardButton(text="🔙Назад🔙")],
     ],

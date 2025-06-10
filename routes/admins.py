@@ -3,7 +3,7 @@ from aiogram.filters import Command, CommandObject
 
 import logging
 
-from db import db, utils
+from db import db, dg, utils
 from routes.keyboards import test_keyboard, admin_keyboard
 from bot import bot
 from messages import ADMIN_HELP
@@ -13,6 +13,7 @@ from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
 router = Router()
 router.message.middleware(TGMiddleWare())
 router.message.middleware(TGAdminMiddleWare())
+
 
 async def send_news(text, exclude: list[int] = []):
     """
@@ -139,3 +140,15 @@ async def gay_profile(msg: types.Message, command: CommandObject):
     else:
         msgid = int(command.args)
         await msg.answer(utils.profile(msgid))
+
+
+@router.message(Command("remove_gift"))
+async def gay_remove_gift(msg: types.Message, command: CommandObject):
+    if command.args == "":
+        await msg.answer("Введите команду в формате /remove_gift <gift_id>")
+    else:
+        gid = int(command.args)
+        if dg.remove_gift(gid):
+            await msg.answer("успешно")
+        else:
+            await msg.answer("ашипка")

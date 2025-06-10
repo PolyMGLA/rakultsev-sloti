@@ -42,4 +42,3 @@ class TGAdminMiddleWare(BaseMiddleware):
             return res
         else:
             return await event.answer("ты недостоин")
-

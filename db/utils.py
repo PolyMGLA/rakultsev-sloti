@@ -30,13 +30,13 @@ def profile(id: int):
     gifts = dg.get_user_gifts(id)
     if user is None or user == False:
         return "Вы не зарегистрированы!\n/start"
-    return f"- Профиль -" \
-            + f"\nПользователь: {user.name}" \
-            + f"\nБаланс: {user.balance}" \
-            + (" (вы в долгах)" if user.balance < 0 else "") \
-            + f"\nКруток слотов: {user.slots_num}" \
-            + f"\nДодепов: {user.dodep_num}" \
-            + f"\n\n- Подарков: {len(gifts)} -\n" \
-            + "\n".join(
-                f"{el.gift_name} #{el.gift_id} - \"{el.descr}\"" for el in gifts
-            )
+    return (
+        f"- Профиль -"
+        + f"\nПользователь: {user.name}"
+        + f"\nБаланс: {user.balance}"
+        + (" (вы в долгах)" if user.balance < 0 else "")
+        + f"\nКруток слотов: {user.slots_num}"
+        + f"\nДодепов: {user.dodep_num}"
+        + f"\n\n- Подарков: {len(gifts)} -\n"
+        + "\n".join(f'{el.gift_name} #{el.gift_id} - "{el.descr}"' for el in gifts)
+    )

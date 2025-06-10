@@ -1,7 +1,15 @@
-from db.database import CasinoUsers, CasinoDodepDates, CasinoVisitors, CasinoGifts, engine, Base
+from db.database import (
+    CasinoUsers,
+    CasinoDodepDates,
+    CasinoVisitors,
+    CasinoGifts,
+    engine,
+    Base,
+)
 
 from contextlib import contextmanager
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
 
 from datetime import datetime
 
@@ -197,6 +205,10 @@ class GiftsService:
     def __init__(self):
         self.session = sessionmaker(bind=engine, expire_on_commit=False)
         Base.metadata.create_all(engine)
+        # with engine.connect() as conn:
+        #     conn.execute(text("DELETE FROM gifts WHERE gift_type=\"lud_cup\""))
+        #     conn.commit()
+
 
     @contextmanager
     def _session_scope(self):
@@ -214,16 +226,37 @@ class GiftsService:
     def get_gift(self, gift_id: int) -> Optional[CasinoGifts]:
         with self._session_scope() as session:
             return session.query(CasinoGifts).filter_by(gift_id=gift_id).first()
-        
+
     def get_user_gifts(self, user_id: int) -> list[CasinoGifts]:
         with self._session_scope() as session:
             return session.query(CasinoGifts).filter_by(user_id=user_id).all()
         return []
-    
-    def add_gift(self, user_id: int, gift_type: str, gift_name: str, descr: str = "") -> bool:
+
+    def add_gift(
+        self, user_id: int, gift_type: str, gift_name: str, descr: str = ""
+    ) -> bool:
         with self._session_scope() as session:
-            session.add(CasinoGifts(user_id=user_id, gift_type=gift_type, gift_name=gift_name, descr=descr))
+            session.add(
+                CasinoGifts(
+                    user_id=user_id,
+                    gift_type=gift_type,
+                    gift_name=gift_name,
+                    descr=descr,
+                )
+            )
             session.commit()
             return True
         return False
 
+
+    def count_type(self, gift_type: str) -> Optional[int]:
+        with self._session_scope() as session:
+            return session.query(CasinoGifts).where(CasinoGifts.gift_type == gift_type).count()
+        return None
+
+
+    def remove_gift(self, gift_id: int) -> bool:
+        with self._session_scope() as session:
+            session.query(CasinoGifts).where(CasinoGifts.gift_id == gift_id).delete()
+            return True
+        return False
