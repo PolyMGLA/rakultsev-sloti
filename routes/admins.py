@@ -128,8 +128,8 @@ async def gay_profile(msg: types.Message, command: CommandObject):
 
 
 @router.message(Command("gift"))
-async def gay_remove_gift(msg: types.Message, command: CommandObject):
-    if command.args == "":
+async def gay_get_gift(msg: types.Message, command: CommandObject):
+    if not command.args:
         await msg.answer("Введите команду в формате /gift <gift_id>")
     else:
         gid = int(command.args)
@@ -139,7 +139,7 @@ async def gay_remove_gift(msg: types.Message, command: CommandObject):
 
 @router.message(Command("remove_gift"))
 async def gay_remove_gift(msg: types.Message, command: CommandObject):
-    if command.args == "":
+    if not command.args:
         await msg.answer("Введите команду в формате /remove_gift <gift_id>")
     else:
         gid = int(command.args)
@@ -147,3 +147,9 @@ async def gay_remove_gift(msg: types.Message, command: CommandObject):
             await msg.answer("успешно")
         else:
             await msg.answer("ашипка")
+
+
+@router.message(Command("gifts_list"))
+async def gay_gifts_list(msg: types.Message):
+    for gift in dg.get_all_gifts():
+        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.name} ({gift.user_id})")

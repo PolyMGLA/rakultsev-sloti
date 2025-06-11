@@ -19,6 +19,7 @@ ADMIN_HELP = """
 /set_balance <id> <chislo> - выдать баланс по id
 /user <id> - профиль пользователя по id
 /gift <gift_id> - получить подарок по id
+/gifts_list - вывести все подарки
 /remove_gift <gift_id> - удалить подарок по id
 
 доступно только:

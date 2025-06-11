@@ -227,6 +227,11 @@ class GiftsService:
         with self._session_scope() as session:
             return session.query(CasinoGifts).filter_by(gift_id=gift_id).first()
 
+    def get_all_gifts(self) -> list[CasinoGifts]:
+        with self._session_scope() as session:
+            return session.query(CasinoGifts).all()
+        return []
+    
     def get_user_gifts(self, user_id: int) -> list[CasinoGifts]:
         with self._session_scope() as session:
             return session.query(CasinoGifts).filter_by(user_id=user_id).all()
