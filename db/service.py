@@ -258,6 +258,7 @@ class GiftsService:
     def remove_gift(self, gift_id: int) -> bool:
         with self._session_scope() as session:
             session.query(CasinoGifts).where(CasinoGifts.gift_id == gift_id).delete()
+            session.commit()
             return True
         return False
 

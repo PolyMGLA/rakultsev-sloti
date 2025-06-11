@@ -18,26 +18,28 @@ SHOP_LIST = """
 """
 
 
+def get_shop_keyboard():
+    return types.ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                types.KeyboardButton(text="💲мега ласт деп💲"),
+                types.KeyboardButton(text="🛍️Описание товаров🛍️")
+            ],
+            [
+                types.KeyboardButton(text="🪙воздух🌪️ (0🪙)"),
+                # types.KeyboardButton(text=f"🪙кубок лудомана🏆 (150🪙, Limited {5 - dg.count_type("lud_cup")}/5)")
+                types.KeyboardButton(text="📦Ящик пандоры📦 (125🪙)"),
+            ],
+            [types.KeyboardButton(text="🔙Назад🔙")],
+        ],
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать",
+    )
+
+
 @router.message(or_f(F.text.lower() == "💸магазин💸", Command("shop")))
 async def gay_shop(msg: types.Message):
-    shop_keyboard = types.ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            types.KeyboardButton(text="💲мега ласт деп💲"),
-            types.KeyboardButton(text="🛍️Описание товаров🛍️")
-        ],
-        [
-            types.KeyboardButton(text="🪙воздух🌪️ (0🪙)"),
-            types.KeyboardButton(text=f"🪙кубок лудомана🏆 (150🪙, Limited {5 - dg.count_type("lud_cup")}/5)")
-        ],
-        [
-            types.KeyboardButton(text="📦Ящик пандоры📦 (125🪙)")
-        ],
-        [types.KeyboardButton(text="🔙Назад🔙")],
-    ],
-    resize_keyboard=True,
-    input_field_placeholder="Выберите что хотите сделать",
-)
+    shop_keyboard = get_shop_keyboard()
 
     await msg.answer("Добро пожаловать в магазин💸", reply_markup=shop_keyboard)
 
@@ -73,11 +75,11 @@ async def gay_buy_cup(msg: types.Message):
 @router.message(F.text.lower() == "📦ящик пандоры📦 (125🪙)")
 async def gay_pandora_box(msg: types.Message):
     user = db.get_user(msg.from_user.id)
-    if user.balance >= 125 and db.update_bal(user.id, user.balance - 125):
+    if db.get_bal(msg.from_user.id) >= 125 and db.update_bal(user.id, db.get_bal(msg.from_user.id) - 125):
         await msg.answer("Куплено: 📦ящик пандоры📦")
         if not dg.has_gift(user.id, "pandora_box"):
             dg.add_gift(user.id, "pandora_box", "📦Открытый ящик", "купил 📦ящик пандоры📦 в магазине")
-        await msg.answer(await pandora.open(user, msg))
+        await msg.answer(await pandora.open(msg))
     else:
         await msg.answer("недостаточно денег!")
 

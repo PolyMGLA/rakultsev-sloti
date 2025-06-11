@@ -4,7 +4,8 @@ from db.database import CasinoUsers
 
 from aiogram import types
 
-async def open(user: CasinoUsers, msg: types.Message) -> str:
+async def open(msg: types.Message) -> str:
+    user = db.get_user(msg.from_user.id)
     ch = utils.randint(1, 100)
     if ch in range(1, 30):
         return "Выпало: 🐔курица🐔"
@@ -20,7 +21,7 @@ async def open(user: CasinoUsers, msg: types.Message) -> str:
         if users is None:
             return "Ошибка %("
         user = utils.choice(users)
-        num = utils.randint(-20, 20)
+        num = utils.randint(-50, 75)
         if db.update_bal(user.id, user.balance + num):
             return f"Выдали случайному игроку {num}🪙"
         return "Ошибка %("
@@ -31,7 +32,7 @@ async def open(user: CasinoUsers, msg: types.Message) -> str:
         else:
             return "Выпало: ничего"
     if ch in range(56, 76):
-        num = utils.randint(-200, 200)
+        num = utils.randint(-200, 150)
         if db.update_bal(user.id, user.balance + num):
             return f"Выпало: {num}🪙"
         return "Ошибка %("

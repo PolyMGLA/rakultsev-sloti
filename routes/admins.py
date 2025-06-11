@@ -127,6 +127,16 @@ async def gay_profile(msg: types.Message, command: CommandObject):
         await msg.answer(utils.profile(msgid))
 
 
+@router.message(Command("gift"))
+async def gay_remove_gift(msg: types.Message, command: CommandObject):
+    if command.args == "":
+        await msg.answer("Введите команду в формате /gift <gift_id>")
+    else:
+        gid = int(command.args)
+        gift = dg.get_gift(gid)
+        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.name} ({gift.user_id})")
+
+
 @router.message(Command("remove_gift"))
 async def gay_remove_gift(msg: types.Message, command: CommandObject):
     if command.args == "":

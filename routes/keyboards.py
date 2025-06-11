@@ -94,7 +94,6 @@ admin_keyboard = types.ReplyKeyboardMarkup(
 test_keyboard = types.ReplyKeyboardMarkup(
     keyboard=[
         [types.KeyboardButton(text="✨сосать✨")],
-        [types.KeyboardButton(text="💸магазин💸")],
         [types.KeyboardButton(text="📛Админ-панель❌")],
     ],
     resize_keyboard=True,
