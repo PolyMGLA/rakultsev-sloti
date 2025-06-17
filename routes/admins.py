@@ -1,8 +1,10 @@
 from aiogram import Router, types, F
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, or_f
 
-from db import db, dg, utils
-from routes.keyboards import test_keyboard, admin_keyboard
+from datetime import datetime
+
+from db import db, dg, dc, utils
+from routes.keyboards import test_keyboard, admin_keyboard, credits_keyboard
 from routes.utils import send_news
 from messages import ADMIN_HELP
 from games import slots
@@ -16,6 +18,34 @@ router.message.middleware(TGAdminMiddleWare())
 @router.message(F.text.lower() == "📛админ-панель❌")
 async def gay_panel(msg: types.Message):
     await msg.answer("Админ панель включена", reply_markup=admin_keyboard)
+
+
+@router.message(F.text.lower() == "💰кредиты💳")
+async def gay_credits(msg: types.Message):
+    await msg.answer("Кредиты. Не забудьте прочитать пользовательское соглашение!", reply_markup=credits_keyboard)
+
+
+@router.message(or_f(F.text.lower() == "💳мои кредиты💰", Command("my_credits")))
+async def gay_my_credits(msg: types.Message):
+    credlist = dc.get_user_credits(msg.from_user.id)
+    if len(credlist) == 0:
+        await msg.answer("Кредитов нет!")
+
+    for cred in credlist:
+        await msg.answer(f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}")
+
+
+@router.message(F.text.lower() == "150🪙/30% в день/3 дня")
+async def gay_credit1(msg: types.Message):
+    user = db.get_user(msg.from_user.id)
+    now = datetime.now().timestamp()
+    if dc.add_credit(user.id, 150, 30, now + 86400, now + 86400 * 3) and db.update_bal(user.id, user.balance + 150):
+        await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
+    else:
+        await msg.answer("ашипка")
+
+
+@router.message(F.text.lower() == "")
 
 
 @router.message(F.text.lower() == "посмотреть секрет")
@@ -68,7 +98,7 @@ async def gay_spisok(msg: types.Message):
     users = db.users_list()
     if not users is None:
         for u in users:
-            await msg.answer(f"{u.name}, {u.id}")
+            await msg.answer(f"{u.prefix}{u.name}, {u.id}")
 
 
 @router.message(F.text.lower() == "тестирование")
@@ -133,7 +163,7 @@ async def gay_get_gift(msg: types.Message, command: CommandObject):
     else:
         gid = int(command.args)
         gift = dg.get_gift(gid)
-        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.name} ({gift.user_id})")
+        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})")
 
 
 @router.message(Command("remove_gift"))
@@ -151,4 +181,4 @@ async def gay_remove_gift(msg: types.Message, command: CommandObject):
 @router.message(Command("gifts_list"))
 async def gay_gifts_list(msg: types.Message):
     for gift in dg.get_all_gifts():
-        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.name} ({gift.user_id})")
+        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})")

@@ -23,10 +23,10 @@ class MacDonaldsBox(Gift):
         user = db.get_user(msg.from_user.id)
         ch = randint(1, 50)
 
-        if ch == 1 and db.update_bal(user.id, user.balance - 5000):
-            await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
-            await msg.answer("Выпало: мама из окна")
-        elif 2 <= ch <= 15 and db.update_bal(user.id, user.balance - 30):
+        if ch == 1 and db.update_bal(user.id, user.balance - 1000):
+            # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
+            await msg.answer("Выпало: проверь баланс")
+        elif 2 <= ch <= 15 and db.update_bal(user.id, user.balance - 30) and db.update_prefix(user.id, "🐔"):
             await msg.answer("Выпало: 🐔курица🐔 (не приготовленная? -30🪙)")
         elif 16 <= ch <= 24 and db.update_bal(user.id, user.balance + 30):
             await msg.answer("Выпало: 🍗курица🍗 (приготовленная? +30🪙)")

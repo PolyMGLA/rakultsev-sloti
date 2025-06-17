@@ -8,7 +8,7 @@ from aiogram import types
 async def open(msg: types.Message) -> str:
     user = db.get_user(msg.from_user.id)
     ch = utils.randint(1, 100)
-    if ch in range(1, 30):
+    if ch in range(1, 30) and db.update_prefix(user.id, "🐔"):
         return "Выпало: 🐔курица🐔"
     if ch in range(30, 40) and db.update_bal(user.id, user.balance - 10):
         return "Выпало: 🦆утка🦆. -10🪙"

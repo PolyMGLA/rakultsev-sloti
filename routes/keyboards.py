@@ -94,8 +94,26 @@ admin_keyboard = types.ReplyKeyboardMarkup(
 test_keyboard = types.ReplyKeyboardMarkup(
     keyboard=[
         [types.KeyboardButton(text="✨сосать✨")],
+        [types.KeyboardButton(text="💰кредиты💳")],
         [types.KeyboardButton(text="📛Админ-панель❌")],
     ],
     resize_keyboard=True,
     input_field_placeholder="Выберите что хотите сделать",
 )
+
+credits_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [types.KeyboardButton(text="📜пользовательское соглашение📜")],
+        [
+            types.KeyboardButton(text="150🪙/30% в день/3 дня"),
+        ],
+        [
+            types.KeyboardButton(text="💳мои кредиты💰"),
+            types.KeyboardButton(text="💵внести деньги💵")
+        ],
+        [types.KeyboardButton(text="💸магазин💸")],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите что хотите сделать",
+)
+

@@ -32,7 +32,7 @@ def profile(id: int):
         return "Вы не зарегистрированы!\n/start"
     return (
         f"- Профиль -"
-        + f"\nПользователь: {user.name}"
+        + f"\nПользователь: {user.prefix}{user.name}"
         + f"\nБаланс: {user.balance}"
         + (" (вы в долгах)" if user.balance < 0 else "")
         + f"\nКруток слотов: {user.slots_num}"

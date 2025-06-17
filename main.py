@@ -1,6 +1,8 @@
 # импорт всякой залупы
 import asyncio
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from aiogram import types, F
 from aiogram.filters import Command, or_f
 
@@ -45,7 +47,7 @@ async def gay_visitors(msg: types.Message):
     """
     vis = dv.get_list()
     await msg.answer(
-        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.user.name}" for el in vis])
+        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.user.prefix}{el.user.name}" for el in vis])
     )
 
 
@@ -123,7 +125,7 @@ async def gay_top(msg: types.Message):
             res += (
                 "\n".join(
                     [
-                        f"{i + 1}. {top[i].name} - {getattr(top[i], nom[2])}"
+                        f"{i + 1}. {top[i].prefix}{top[i].name} - {getattr(top[i], nom[2])}"
                         for i in range(len(top))
                     ]
                 )
@@ -155,6 +157,7 @@ async def gay_back(msg: types.Message):
 
 async def main():
     print("starting bot..")
+    scheduler = AsyncIOScheduler()
 
     dp.message.middleware(TGMiddleWare())
 
@@ -163,15 +166,13 @@ async def main():
     dp.include_router(routes.blackjack.router)
     dp.include_router(routes.shop.router)
 
-    bot_task = asyncio.create_task(dp.start_polling(bot))
-    cred_task = asyncio.create_task(credits_task())
+    bot_task = dp.start_polling(bot)
+    cred_task = credits_task
 
-    try:
-        await bot_task
-    except (KeyboardInterrupt, asyncio.CancelledError):
-        print("exit..")
-        bot_task.cancel()
-        cred_task.cancel()
+    scheduler.add_job(cred_task, "interval", minutes=1)
+
+    scheduler.start()
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

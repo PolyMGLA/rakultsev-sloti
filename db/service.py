@@ -67,6 +67,14 @@ class UserService:
             session.commit()
             return True
         return False
+    
+    def update_prefix(self, id: int, prefix: str) -> bool:
+        with self._session_scope() as session:
+            user = session.query(CasinoUsers).filter_by(id=id).first()
+            user.prefix = prefix
+            session.commit()
+            return True
+        return False
 
     def add_slot(self, id: int) -> bool:
         with self._session_scope() as session:

@@ -55,8 +55,9 @@ async def spin(db, dg, id: int) -> str:
     if s == SECRET:
         newbal += utils.randint(a=-1000, b=1000)
         comb += "secret; "
+        user = db.get_user(id)
         await send_news(
-            f"Пользователь {db.get_user(id).name} выбил секретную комбинацию!!\n"
+            f"Пользователь {user.prefix}{user.name} выбил секретную комбинацию!!\n"
             + "прошлое комбо:"
             + SECRET
             + "\n- КОМБИНАЦИЯ ИЗМЕНЕНА- "
@@ -85,12 +86,14 @@ async def spin(db, dg, id: int) -> str:
             newbal += 999
             comb = "Absolute cinema"
             dg.add_gift(id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
-            await send_news(f"{db.get_user(id).name} - absolute sigma!!")
+            user = db.get_user(id)
+            await send_news(f"{user.prefix}{user.name} - absolute sigma!!")
         case "💀💀💀":
             newbal -= 5000
             comb = "Вы проиграли хату"
             dg.add_gift(id, "dead", "💀Игрушечный череп", "проиграл все")
-            await send_news(f"{db.get_user(id).name} проиграл семью в казино")
+            user = db.get_user(id)
+            await send_news(f"{user.prefix}{user.name} проиграл семью в казино")
         case "🍌🍑🍌":
             newbal += utils.randint(-50, 50)
             comb = "Пайпер Перри..?"
