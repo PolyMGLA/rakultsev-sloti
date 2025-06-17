@@ -3,6 +3,7 @@ from db.database import (
     CasinoDodepDates,
     CasinoVisitors,
     CasinoGifts,
+    CasinoCredits,
     engine,
     Base,
 )
@@ -205,9 +206,6 @@ class GiftsService:
     def __init__(self):
         self.session = sessionmaker(bind=engine, expire_on_commit=False)
         Base.metadata.create_all(engine)
-        # with engine.connect() as conn:
-        #     conn.execute(text("DELETE FROM gifts WHERE gift_type=\"lud_cup\""))
-        #     conn.commit()
 
 
     @contextmanager
@@ -273,3 +271,79 @@ class GiftsService:
         for g in gifts:
             if g.gift_type == gift_type: return True
         return False
+
+
+class CreditsService:
+    def __init__(self):
+        self.session = sessionmaker(bind=engine, expire_on_commit=False)
+        Base.metadata.create_all(engine)
+
+
+    @contextmanager
+    def _session_scope(self):
+        """Контекстный менеджер для работы с сессией"""
+        session = self.session()
+        try:
+            yield session
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            logger.error(str(e))
+        finally:
+            session.close()
+
+    def get_credit(self, credit_id: int) -> Optional[CasinoCredits]:
+        with self._session_scope() as session:
+            return session.query(CasinoCredits).filter_by(credit_id=credit_id).first()
+
+    def get_all_credits(self) -> list[CasinoCredits]:
+        with self._session_scope() as session:
+            return session.query(CasinoCredits).all()
+        return []
+    
+    def get_user_credits(self, user_id: int) -> list[CasinoCredits]:
+        with self._session_scope() as session:
+            return session.query(CasinoCredits).filter_by(user_id=user_id).all()
+        return []
+    
+    def update_sum(self, credit_id: int, sum: int) -> bool:
+        with self._session_scope() as session:
+            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id)
+            cred.sum = sum
+            session.commit()
+            return True
+        return False
+    
+    def update_next_date(self, credit_id: int, next_date: int) -> bool:
+        with self._session_scope() as session:
+            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id)
+            cred.next_date = next_date
+            session.commit()
+            return True
+        return False
+
+    def add_credit(
+        self, user_id: int, sum: int, perc: int, next_date: int, last_date: int
+    ) -> bool:
+        with self._session_scope() as session:
+            session.add(
+                CasinoCredits(
+                    user_id=user_id,
+                    sum=sum,
+                    perc=perc,
+                    next_date=next_date,
+                    last_date=last_date,
+                )
+            )
+            session.commit()
+            return True
+        return False
+
+
+    def remove_credit(self, credit_id: int) -> bool:
+        with self._session_scope() as session:
+            session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).delete()
+            session.commit()
+            return True
+        return False
+

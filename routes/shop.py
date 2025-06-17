@@ -1,9 +1,11 @@
 from aiogram import Router, types, F
-from aiogram.filters import or_f, Command
+from aiogram.filters import or_f, Command, CommandObject
+
+from datetime import datetime
 
 from messages import DONATE
 from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
-from db import db, dg
+from db import db, dc
 from games import pandora
 from shop import gifts
 
@@ -26,6 +28,7 @@ def get_shop_keyboard():
             ],
             [
                 types.KeyboardButton(text=gifts[2].shop_cap()),
+                types.KeyboardButton(text=gifts[3].shop_cap()),
             ],
             [types.KeyboardButton(text="🔙Назад🔙")],
         ],
@@ -59,6 +62,14 @@ for gift in gifts:
                 await msg.answer("недостаточно денег!")
         else:
             await msg.answer("все распродано.")
+
+
+@router.message(Command("credit"))
+async def gay_credit(msg: types.Message, command: CommandObject):
+    now = datetime.now().timestamp()
+    if dc.add_credit(msg.from_user.id, 100, 50, now + 10, now + 70):
+        await msg.answer("кредит взяли")
+    
 
 
 @router.message(F.text.lower() == "💸донат админам💸")

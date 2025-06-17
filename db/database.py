@@ -34,6 +34,12 @@ class CasinoUsers(Base):
         cascade="all, delete-orphan",
         lazy="joined",
     )
+    credits = relationship(
+        "CasinoCredits",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="joined",
+    )
 
 
 class CasinoDodepDates(Base):
@@ -58,3 +64,14 @@ class CasinoGifts(Base):
     gift_name = Column("gift_name", String, nullable=False)
     descr = Column("descr", String, default="")
     user = relationship("CasinoUsers", back_populates="gifts", lazy="joined")
+
+
+class CasinoCredits(Base):
+    __tablename__ = "credits"
+    credit_id = Column("credit_id", Integer, primary_key=True)
+    user_id = Column("user_id", Integer, ForeignKey("users.id"))
+    sum = Column("sum", Integer, nullable=False)
+    perc = Column("perc", Integer, nullable=False)
+    next_date = Column("next_date", Integer, nullable=False)
+    last_date = Column("last_date", Integer, nullable=False)
+    user = relationship("CasinoUsers", back_populates="credits", lazy="joined")

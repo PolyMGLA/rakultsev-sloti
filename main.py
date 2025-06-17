@@ -5,6 +5,7 @@ from aiogram import types, F
 from aiogram.filters import Command, or_f
 
 from db import db, dt, dv, utils
+from tasks import credits_task
 import routes.slots
 import routes.admins
 import routes.blackjack
@@ -162,7 +163,10 @@ async def main():
     dp.include_router(routes.blackjack.router)
     dp.include_router(routes.shop.router)
 
-    await dp.start_polling(bot)
+    bot_task = dp.start_polling(bot)
+    cred_task = credits_task()
+
+    await asyncio.gather(bot_task, cred_task)
 
 
 if __name__ == "__main__":
