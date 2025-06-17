@@ -11,6 +11,7 @@ class CasinoUsers(Base):
     __tablename__ = "users"
     id = Column("id", Integer, primary_key=True)
     name = Column("name", String)
+    prefix = Column("prefix", String, default="")
     balance = Column("balance", Integer, default=100)
     slots_num = Column("slots_num", Integer, default=0)
     dodep_num = Column("dodep_num", Integer, default=0)

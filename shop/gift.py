@@ -1,5 +1,3 @@
-from typing import Callable, Any, Awaitable
-
 class Gift:
     giftname: str
     cost: int

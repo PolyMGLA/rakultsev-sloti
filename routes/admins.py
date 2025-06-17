@@ -4,7 +4,6 @@ from aiogram.filters import Command, CommandObject
 from db import db, dg, utils
 from routes.keyboards import test_keyboard, admin_keyboard
 from routes.utils import send_news
-from bot import bot
 from messages import ADMIN_HELP
 from games import slots
 from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare

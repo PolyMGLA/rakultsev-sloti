@@ -163,10 +163,15 @@ async def main():
     dp.include_router(routes.blackjack.router)
     dp.include_router(routes.shop.router)
 
-    bot_task = dp.start_polling(bot)
-    cred_task = credits_task()
+    bot_task = asyncio.create_task(dp.start_polling(bot))
+    cred_task = asyncio.create_task(credits_task())
 
-    await asyncio.gather(bot_task, cred_task)
+    try:
+        await bot_task
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        print("exit..")
+        bot_task.cancel()
+        cred_task.cancel()
 
 
 if __name__ == "__main__":

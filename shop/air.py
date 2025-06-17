@@ -7,7 +7,7 @@ class Air(Gift):
         super().__init__(
             giftname = "🪙воздух🌪️",
             cost = 0,
-            desc = "ящик со случайным содержимым"
+            desc = "подумайте, что это"
         )
     
     def can_buy(self, id: int):

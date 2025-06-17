@@ -4,9 +4,8 @@ from aiogram.filters import or_f, Command, CommandObject
 from datetime import datetime
 
 from messages import DONATE
-from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
+from middlewares.telegram import TGMiddleWare
 from db import db, dc
-from games import pandora
 from shop import gifts
 
 router = Router()

@@ -1,10 +1,8 @@
-from aiogram import Router, types, F, Bot
+from aiogram import Router, types, F
 from aiogram.filters import Command, or_f
 
 from games import slots
-from db import db, dt, dv, dg, utils
-from db.database import CasinoUsers
-from routes.admins import send_news
+from db import db, dg
 from games.slots import RULES
 from middlewares.telegram import TGMiddleWare
 

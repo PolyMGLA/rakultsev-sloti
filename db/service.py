@@ -10,7 +10,6 @@ from db.database import (
 
 from contextlib import contextmanager
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
 
 from datetime import datetime
 
@@ -308,7 +307,7 @@ class CreditsService:
     
     def update_sum(self, credit_id: int, sum: int) -> bool:
         with self._session_scope() as session:
-            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id)
+            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).first()
             cred.sum = sum
             session.commit()
             return True
@@ -316,7 +315,7 @@ class CreditsService:
     
     def update_next_date(self, credit_id: int, next_date: int) -> bool:
         with self._session_scope() as session:
-            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id)
+            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).first()
             cred.next_date = next_date
             session.commit()
             return True
