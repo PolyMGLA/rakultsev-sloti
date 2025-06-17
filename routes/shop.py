@@ -5,17 +5,12 @@ from messages import DONATE
 from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
 from db import db, dg
 from games import pandora
+from shop import gifts
 
 router = Router()
 router.message.middleware(TGMiddleWare())
 
-
-SHOP_LIST = """
-- Товары в магазине -
-1. воздух🌪️ - просто воздух. Буквально ничего не дает
-2. кубок лудомана🏆 - подарок в профиль. лимитированная коллекция из 5 экземпляров.
-3. 📦ящик пандоры📦 - ящик со случайным содержимым
-"""
+SHOP_LIST = """- Товары в магазине -\n""" + "\n".join([f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)])
 
 
 def get_shop_keyboard():
@@ -26,9 +21,11 @@ def get_shop_keyboard():
                 types.KeyboardButton(text="🛍️Описание товаров🛍️")
             ],
             [
-                types.KeyboardButton(text="🪙воздух🌪️ (0🪙)"),
-                # types.KeyboardButton(text=f"🪙кубок лудомана🏆 (150🪙, Limited {5 - dg.count_type("lud_cup")}/5)")
-                types.KeyboardButton(text="📦Ящик пандоры📦 (125🪙)"),
+                types.KeyboardButton(text=gifts[0].shop_cap()),
+                types.KeyboardButton(text=gifts[1].shop_cap()),
+            ],
+            [
+                types.KeyboardButton(text=gifts[2].shop_cap()),
             ],
             [types.KeyboardButton(text="🔙Назад🔙")],
         ],
@@ -49,39 +46,18 @@ async def gay_shop_list(msg: types.Message):
     await msg.answer(SHOP_LIST)
 
 
-@router.message(F.text.lower() == "🪙воздух🌪️ (0🪙)")
-async def gay_buy_air(msg: types.Message):
-    await msg.answer(
-        f"Куплено: воздух (использовать по назначению)\nЧерез секунду купленый воздух пропал."
-    )
-
-
-@router.message(F.text.lower().startswith("🪙кубок лудомана🏆 (150🪙, limited"))
-async def gay_buy_cup(msg: types.Message):
-    user = db.get_user(msg.from_user.id)
-    if dg.count_type("lud_cup") + 1 <= 5:
-        if not dg.has_gift(user.id, "lud_cup"):
-            if user.balance >= 150 and db.update_bal(user.id, user.balance - 150):
-                dg.add_gift(msg.from_user.id, "lud_cup", "кубок лудомана🏆", "куплено в лимитированной коллекции")
-                await msg.answer("Куплено: кубок лудомана🏆")
+for gift in gifts:
+    @router.message(F.text == gift.shop_cap())
+    async def gay_gift(msg: types.Message, gift=gift):
+        user = db.get_user(msg.from_user.id)
+        if gift.can_buy(msg.from_user.id):
+            if user.balance >= gift.cost \
+                and db.update_bal(msg.from_user.id, user.balance - gift.cost):
+                await gift.open(msg)
             else:
                 await msg.answer("недостаточно денег!")
         else:
-            await msg.answer("уже куплено")
-    else:
-        await msg.answer("Все распродано.")
-
-
-@router.message(F.text.lower() == "📦ящик пандоры📦 (125🪙)")
-async def gay_pandora_box(msg: types.Message):
-    user = db.get_user(msg.from_user.id)
-    if db.get_bal(msg.from_user.id) >= 125 and db.update_bal(user.id, db.get_bal(msg.from_user.id) - 125):
-        await msg.answer("Куплено: 📦ящик пандоры📦")
-        if not dg.has_gift(user.id, "pandora_box"):
-            dg.add_gift(user.id, "pandora_box", "📦Открытый ящик", "купил 📦ящик пандоры📦 в магазине")
-        await msg.answer(await pandora.open(msg))
-    else:
-        await msg.answer("недостаточно денег!")
+            await msg.answer("все распродано.")
 
 
 @router.message(F.text.lower() == "💸донат админам💸")
