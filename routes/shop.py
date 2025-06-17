@@ -53,6 +53,7 @@ for gift in gifts:
         if gift.can_buy(msg.from_user.id):
             if user.balance >= gift.cost \
                 and db.update_bal(msg.from_user.id, user.balance - gift.cost):
+                await msg.answer(f"Куплено: {gift.giftname}")
                 await gift.open(msg)
             else:
                 await msg.answer("недостаточно денег!")

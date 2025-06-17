@@ -17,4 +17,4 @@ class Air(Gift):
         return f"{self.giftname} ({self.cost}🪙)"
 
     async def open(self, msg: types.Message):
-        await msg.answer("Куплено: воздух (использовать по назначению)\nЧерез секунду купленый воздух пропал.")
+        await msg.answer("Через секунду купленый воздух пропал.")

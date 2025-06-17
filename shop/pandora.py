@@ -19,7 +19,6 @@ class PandoraBox(Gift):
         return f"{self.giftname} ({self.cost}🪙)"
 
     async def open(self, msg: types.Message):
-        await msg.answer(f"Куплено: {self.giftname}")
         if not dg.has_gift(msg.from_user.id, "pandora_box"):
             dg.add_gift(msg.from_user.id, "pandora_box", "📦Открытый ящик", "купил 📦ящик пандоры📦 в магазине")
         
