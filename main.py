@@ -166,10 +166,7 @@ async def main():
     dp.include_router(routes.blackjack.router)
     dp.include_router(routes.shop.router)
 
-    bot_task = dp.start_polling(bot)
-    cred_task = credits_task
-
-    scheduler.add_job(cred_task, "interval", minutes=1)
+    scheduler.add_job(credits_task, "interval", minutes=1)
 
     scheduler.start()
     await dp.start_polling(bot)
