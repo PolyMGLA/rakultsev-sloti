@@ -2,17 +2,14 @@ from shop.gift import Gift
 
 from aiogram import types
 
+
 class Air(Gift):
     def __init__(self):
-        super().__init__(
-            giftname = "🪙воздух🌪️",
-            cost = 0,
-            desc = "подумайте, что это"
-        )
-    
+        super().__init__(giftname="🪙воздух🌪️", cost=0, desc="подумайте, что это")
+
     def can_buy(self, id: int):
         return True
-    
+
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"
 

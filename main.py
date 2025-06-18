@@ -36,15 +36,16 @@ async def gay_start(msg: types.Message, command: CommandObject):
     args = None
     try:
         args = int(command.args)
-        user = db.get_user(args)
-        if not user is None:
-            db.update_bal(user.id, user.balance + 150)
     except (ValueError, TypeError):
         pass
-    
 
     if utils.init_user(msg):
+        if not args is None:
+            user = db.get_user(args)
+            if not user is None:
+                db.update_bal(user.id, user.balance + 150)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
+        db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + 150)
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
@@ -56,7 +57,8 @@ async def gay_visitors(msg: types.Message):
     """
     vis = db.get_visit_list()
     await msg.answer(
-        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.prefix}{el.name}" for el in vis])
+        f"В казино: {len(vis)} человек\n"
+        + "\n".join([f"{el.prefix}{el.name}" for el in vis])
     )
 
 
@@ -95,7 +97,7 @@ async def gay_dodep(msg: types.Message):
     if user.balance < 2:
 
         tdt = int(datetime.now().timestamp())
-        last_dodep = db.get_dodep_date(msg.from_user.id).date
+        last_dodep = db.get_dodep_date(msg.from_user.id)
         timeout = 600 - 10 * db.get_bal(msg.from_user.id)
         if tdt - last_dodep < timeout:
             await msg.answer(
@@ -122,11 +124,11 @@ async def gay_top(msg: types.Message):
     res = ""
 
     for nom in [
-        [db.top5_money, "счету", "balance"],
-        [db.top5_slots, "круткам", "slots_num"],
-        [db.top5_dodeps, "додепам", "dodep_num"],
+        ["balance", "счету"],
+        ["slots_num", "круткам"],
+        ["dodep_num", "додепам"],
     ]:
-        top = nom[0]()
+        top = db.topn(5, nom[0])
         res += f"Топ по {nom[1]}:\n"
         if top is None:
             res += "ашипка\n\n"
@@ -134,7 +136,7 @@ async def gay_top(msg: types.Message):
             res += (
                 "\n".join(
                     [
-                        f"{i + 1}. {top[i].prefix}{top[i].name} - {getattr(top[i], nom[2])}"
+                        f"{i + 1}. {top[i].prefix}{top[i].name} - {getattr(top[i], nom[0])}"
                         for i in range(len(top))
                     ]
                 )

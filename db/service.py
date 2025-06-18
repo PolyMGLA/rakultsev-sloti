@@ -65,7 +65,7 @@ class UserService:
             session.commit()
             return True
         return False
-    
+
     def update_prefix(self, id: int, prefix: str) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
@@ -90,33 +90,17 @@ class UserService:
             return True
         return False
 
-    def top5_money(self) -> Optional[list[CasinoUsers]]:
+    def topn(self, n: int, attr: str) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
             return (
                 session.query(CasinoUsers)
-                .order_by(CasinoUsers.balance)
-                .all()[-5:][::-1]
+                .order_by(getattr(CasinoUsers, attr))
+                .all()[-n:][::-1]
             )
 
-    def top5_slots(self) -> Optional[list[CasinoUsers]]:
+    def get_dodep_date(self, id) -> Optional[CasinoUsers]:
         with self._session_scope() as session:
-            return (
-                session.query(CasinoUsers)
-                .order_by(CasinoUsers.slots_num)
-                .all()[-5:][::-1]
-            )
-
-    def top5_dodeps(self) -> Optional[list[CasinoUsers]]:
-        with self._session_scope() as session:
-            return (
-                session.query(CasinoUsers)
-                .order_by(CasinoUsers.dodep_num)
-                .all()[-5:][::-1]
-            )
-
-    def get_dodep_date(self, id) -> Optional[list[CasinoUsers]]:
-        with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first()
+            return session.query(CasinoUsers).filter_by(id=id).first().dodep_date
 
     def set_dodep_date(self, id, date) -> bool:
         with self._session_scope() as session:
@@ -125,10 +109,6 @@ class UserService:
             session.commit()
             return True
         return False
-
-    def get_visit_date(self, id) -> Optional[CasinoUsers]:
-        with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first()
 
     def set_visit_date(self, id) -> bool:
         with self._session_scope() as session:
@@ -152,7 +132,6 @@ class GiftsService:
         self.session = sessionmaker(bind=engine, expire_on_commit=False)
         Base.metadata.create_all(engine)
 
-
     @contextmanager
     def _session_scope(self):
         """Контекстный менеджер для работы с сессией"""
@@ -174,7 +153,7 @@ class GiftsService:
         with self._session_scope() as session:
             return session.query(CasinoGifts).all()
         return []
-    
+
     def get_user_gifts(self, user_id: int) -> list[CasinoGifts]:
         with self._session_scope() as session:
             return session.query(CasinoGifts).filter_by(user_id=user_id).all()
@@ -196,12 +175,14 @@ class GiftsService:
             return True
         return False
 
-
     def count_type(self, gift_type: str) -> Optional[int]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).where(CasinoGifts.gift_type == gift_type).count()
+            return (
+                session.query(CasinoGifts)
+                .where(CasinoGifts.gift_type == gift_type)
+                .count()
+            )
         return None
-
 
     def remove_gift(self, gift_id: int) -> bool:
         with self._session_scope() as session:
@@ -210,11 +191,11 @@ class GiftsService:
             return True
         return False
 
-
     def has_gift(self, user_id: int, gift_type: str) -> bool:
         gifts = self.get_user_gifts(user_id)
         for g in gifts:
-            if g.gift_type == gift_type: return True
+            if g.gift_type == gift_type:
+                return True
         return False
 
 
@@ -222,7 +203,6 @@ class CreditsService:
     def __init__(self):
         self.session = sessionmaker(bind=engine, expire_on_commit=False)
         Base.metadata.create_all(engine)
-
 
     @contextmanager
     def _session_scope(self):
@@ -245,23 +225,31 @@ class CreditsService:
         with self._session_scope() as session:
             return session.query(CasinoCredits).all()
         return []
-    
+
     def get_user_credits(self, user_id: int) -> list[CasinoCredits]:
         with self._session_scope() as session:
             return session.query(CasinoCredits).filter_by(user_id=user_id).all()
         return []
-    
+
     def update_sum(self, credit_id: int, sum: int) -> bool:
         with self._session_scope() as session:
-            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).first()
+            cred = (
+                session.query(CasinoCredits)
+                .where(CasinoCredits.credit_id == credit_id)
+                .first()
+            )
             cred.sum = sum
             session.commit()
             return True
         return False
-    
+
     def update_next_date(self, credit_id: int, next_date: int) -> bool:
         with self._session_scope() as session:
-            cred = session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).first()
+            cred = (
+                session.query(CasinoCredits)
+                .where(CasinoCredits.credit_id == credit_id)
+                .first()
+            )
             cred.next_date = next_date
             session.commit()
             return True
@@ -284,11 +272,11 @@ class CreditsService:
             return True
         return False
 
-
     def remove_credit(self, credit_id: int) -> bool:
         with self._session_scope() as session:
-            session.query(CasinoCredits).where(CasinoCredits.credit_id == credit_id).delete()
+            session.query(CasinoCredits).where(
+                CasinoCredits.credit_id == credit_id
+            ).delete()
             session.commit()
             return True
         return False
-

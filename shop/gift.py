@@ -11,7 +11,6 @@ class Gift:
 
     def shop_cap(self) -> str:
         return ""
-    
+
     async def open(self, id: int):
         await ""
-    

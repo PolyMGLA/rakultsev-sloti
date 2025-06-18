@@ -4,6 +4,7 @@ from bot import bot
 
 from db import db, dc
 
+
 async def credits_task():
     tekd = datetime.now().timestamp()
     credlist = dc.get_all_credits()
@@ -12,8 +13,14 @@ async def credits_task():
             await bot.send_message("кредит успешно погашен!")
             dc.remove_credit(cred.credit_id)
         elif cred.last_date <= tekd:
-            await bot.send_message(cred.user_id, "вы просрочили кредит! на ваш счет начислен штраф.")
-            db.update_bal(cred.user_id, cred.user.balance - cred.sum * 5 * len(dc.get_user_credits(cred.user_id)))
+            await bot.send_message(
+                cred.user_id, "вы просрочили кредит! на ваш счет начислен штраф."
+            )
+            db.update_bal(
+                cred.user_id,
+                cred.user.balance
+                - cred.sum * 5 * len(dc.get_user_credits(cred.user_id)),
+            )
             dc.remove_credit(cred.credit_id)
         elif cred.next_date <= tekd:
             dc.update_next_date(cred.credit_id, cred.next_date + 86400)

@@ -5,17 +5,18 @@ from db import db
 
 from aiogram import types
 
+
 class MacDonaldsBox(Gift):
     def __init__(self):
         super().__init__(
-            giftname = "🍔Бокс из мака🍟",
-            cost = 101,
-            desc = "вернулся в РФ (все шутки про маму от Макса)"
+            giftname="🍔Бокс из мака🍟",
+            cost=101,
+            desc="вернулся в РФ (все шутки про маму от Макса)",
         )
-    
+
     def can_buy(self, id: int):
         return True
-    
+
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"
 
@@ -26,7 +27,11 @@ class MacDonaldsBox(Gift):
         if ch == 1 and db.update_bal(user.id, user.balance - 1000):
             # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
             await msg.answer("Выпало: проверь баланс")
-        elif 2 <= ch <= 15 and db.update_bal(user.id, user.balance - 30) and db.update_prefix(user.id, "🐔"):
+        elif (
+            2 <= ch <= 15
+            and db.update_bal(user.id, user.balance - 30)
+            and db.update_prefix(user.id, "🐔")
+        ):
             await msg.answer("Выпало: 🐔курица🐔 (не приготовленная? -30🪙)")
         elif 16 <= ch <= 24 and db.update_bal(user.id, user.balance + 30):
             await msg.answer("Выпало: 🍗курица🍗 (приготовленная? +30🪙)")

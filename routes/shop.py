@@ -11,7 +11,9 @@ from shop import gifts
 router = Router()
 router.message.middleware(TGMiddleWare())
 
-SHOP_LIST = """- Товары в магазине -\n""" + "\n".join([f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)])
+SHOP_LIST = """- Товары в магазине -\n""" + "\n".join(
+    [f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)]
+)
 
 
 def get_shop_keyboard():
@@ -19,7 +21,7 @@ def get_shop_keyboard():
         keyboard=[
             [
                 types.KeyboardButton(text="💲мега ласт деп💲"),
-                types.KeyboardButton(text="🛍️Описание товаров🛍️")
+                types.KeyboardButton(text="🛍️Описание товаров🛍️"),
             ],
             [
                 types.KeyboardButton(text=gifts[0].shop_cap()),
@@ -49,12 +51,14 @@ async def gay_shop_list(msg: types.Message):
 
 
 for gift in gifts:
+
     @router.message(F.text == gift.shop_cap())
     async def gay_gift(msg: types.Message, gift=gift):
         user = db.get_user(msg.from_user.id)
         if gift.can_buy(msg.from_user.id):
-            if user.balance >= gift.cost \
-                and db.update_bal(msg.from_user.id, user.balance - gift.cost):
+            if user.balance >= gift.cost and db.update_bal(
+                msg.from_user.id, user.balance - gift.cost
+            ):
                 await msg.answer(f"Куплено: {gift.giftname}")
                 await gift.open(msg)
             else:
@@ -68,10 +72,8 @@ async def gay_credit(msg: types.Message, command: CommandObject):
     now = datetime.now().timestamp()
     if dc.add_credit(msg.from_user.id, 100, 50, now + 10, now + 70):
         await msg.answer("кредит взяли")
-    
 
 
 @router.message(F.text.lower() == "💸донат админам💸")
 async def gay_donate(msg: types.Message):
     await msg.answer(DONATE)
-

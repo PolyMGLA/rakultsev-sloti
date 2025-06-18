@@ -4,9 +4,4 @@ from shop.air import Air
 from shop.hamster_coin import HamsterCoin
 from shop.mcdonalds_box import MacDonaldsBox
 
-gifts: list[Gift] = [
-    Air(),
-    PandoraBox(),
-    HamsterCoin(),
-    MacDonaldsBox()
-]
+gifts: list[Gift] = [Air(), PandoraBox(), HamsterCoin(), MacDonaldsBox()]

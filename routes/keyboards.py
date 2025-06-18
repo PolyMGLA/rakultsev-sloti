@@ -109,11 +109,10 @@ credits_keyboard = types.ReplyKeyboardMarkup(
         ],
         [
             types.KeyboardButton(text="💳мои кредиты💰"),
-            types.KeyboardButton(text="💵внести деньги💵")
+            types.KeyboardButton(text="💵внести деньги💵"),
         ],
         [types.KeyboardButton(text="💸магазин💸")],
     ],
     resize_keyboard=True,
     input_field_placeholder="Выберите что хотите сделать",
 )
-

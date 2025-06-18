@@ -28,7 +28,9 @@ async def open(msg: types.Message) -> str:
         return "Ошибка %("
     if ch == 55:
         if not dg.has_gift(user.id, "pandora_lock"):
-            dg.add_gift(user.id, "pandora_lock", "🔓Замок", "случайно отломан от ящика Пандоры")
+            dg.add_gift(
+                user.id, "pandora_lock", "🔓Замок", "случайно отломан от ящика Пандоры"
+            )
             return "Выпало: 🔓Замок"
         else:
             return "Выпало: ничего"
@@ -48,19 +50,22 @@ async def open(msg: types.Message) -> str:
 class PandoraBox(Gift):
     def __init__(self):
         super().__init__(
-            giftname = "📦ящик пандоры📦",
-            cost = 125,
-            desc = "ящик со случайным содержимым"
+            giftname="📦ящик пандоры📦", cost=125, desc="ящик со случайным содержимым"
         )
 
     def can_buy(self, id: int) -> bool:
         return True
-    
+
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"
 
     async def open(self, msg: types.Message):
         if not dg.has_gift(msg.from_user.id, "pandora_box"):
-            dg.add_gift(msg.from_user.id, "pandora_box", "📦Открытый ящик", "купил 📦ящик пандоры📦 в магазине")
-        
+            dg.add_gift(
+                msg.from_user.id,
+                "pandora_box",
+                "📦Открытый ящик",
+                "купил 📦ящик пандоры📦 в магазине",
+            )
+
         await msg.answer(await open(msg))

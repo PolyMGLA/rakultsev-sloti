@@ -30,7 +30,6 @@ async def gay_spin(msg: types.Message):
         msgs = await slots.spin(db, dg, msg.from_user.id)
     for m in msgs:
         await msg.answer(m)
-    
 
 
 @router.message(F.text.lower() == "🔥правила слотов🔥")

@@ -22,7 +22,10 @@ async def gay_panel(msg: types.Message):
 
 @router.message(F.text.lower() == "💰кредиты💳")
 async def gay_credits(msg: types.Message):
-    await msg.answer("Кредиты. Не забудьте прочитать пользовательское соглашение!", reply_markup=credits_keyboard)
+    await msg.answer(
+        "Кредиты. Не забудьте прочитать пользовательское соглашение!",
+        reply_markup=credits_keyboard,
+    )
 
 
 @router.message(or_f(F.text.lower() == "💳мои кредиты💰", Command("my_credits")))
@@ -32,22 +35,24 @@ async def gay_my_credits(msg: types.Message):
         await msg.answer("Кредитов нет!")
 
     for cred in credlist:
-        await msg.answer(f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}")
+        await msg.answer(
+            f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}"
+        )
 
 
 @router.message(F.text.lower() == "150🪙/30% в день/3 дня")
 async def gay_credit1(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     now = datetime.now().timestamp()
-    if dc.add_credit(user.id, 150, 30, now + 86400, now + 86400 * 3) and db.update_bal(user.id, user.balance + 150):
+    if dc.add_credit(user.id, 150, 30, now + 86400, now + 86400 * 3) and db.update_bal(
+        user.id, user.balance + 150
+    ):
         await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
     else:
         await msg.answer("ашипка")
 
 
 @router.message(F.text.lower() == "")
-
-
 @router.message(F.text.lower() == "посмотреть секрет")
 async def gay_secret_get(msg: types.Message):
     """
@@ -163,7 +168,9 @@ async def gay_get_gift(msg: types.Message, command: CommandObject):
     else:
         gid = int(command.args)
         gift = dg.get_gift(gid)
-        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})")
+        await msg.answer(
+            f'{gift.gift_name} #{gift.gift_id} - "{gift.descr}"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})'
+        )
 
 
 @router.message(Command("remove_gift"))
@@ -181,4 +188,6 @@ async def gay_remove_gift(msg: types.Message, command: CommandObject):
 @router.message(Command("gifts_list"))
 async def gay_gifts_list(msg: types.Message):
     for gift in dg.get_all_gifts():
-        await msg.answer(f"{gift.gift_name} #{gift.gift_id} - \"{gift.descr}\"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})")
+        await msg.answer(
+            f'{gift.gift_name} #{gift.gift_id} - "{gift.descr}"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})'
+        )

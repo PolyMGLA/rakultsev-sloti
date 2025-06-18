@@ -3,6 +3,7 @@ from bot import bot
 
 import logging
 
+
 async def send_news(text, exclude: list[int] = []):
     """
     Отправка новостей всем пользователям, за исключением списка exclude (аргумент опциональный)
