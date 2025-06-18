@@ -1,7 +1,5 @@
 from db.database import (
     CasinoUsers,
-    CasinoDodepDates,
-    CasinoVisitors,
     CasinoGifts,
     CasinoCredits,
     engine,
@@ -116,95 +114,35 @@ class UserService:
                 .all()[-5:][::-1]
             )
 
-
-class DodepService:
-    def __init__(self):
-        self.session = sessionmaker(bind=engine, expire_on_commit=False)
-        Base.metadata.create_all(engine)
-
-    @contextmanager
-    def _session_scope(self):
-        """Контекстный менеджер для работы с сессией"""
-        session = self.session()
-        try:
-            yield session
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(str(e))
-        finally:
-            session.close()
-
-    def add_user(self, id) -> bool:
+    def get_dodep_date(self, id) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
-            if not self.get_date(id) is None:
-                return False
-            session.add(CasinoDodepDates(id=id))
+            return session.query(CasinoUsers).filter_by(id=id).first()
+
+    def set_dodep_date(self, id, date) -> bool:
+        with self._session_scope() as session:
+            user = session.query(CasinoUsers).filter_by(id=id).first()
+            user.dodep_date = date
             session.commit()
             return True
         return False
 
-    def get_date(self, id) -> Optional[list[CasinoDodepDates]]:
+    def get_visit_date(self, id) -> Optional[CasinoUsers]:
         with self._session_scope() as session:
-            return session.query(CasinoDodepDates).filter_by(id=id).first()
+            return session.query(CasinoUsers).filter_by(id=id).first()
 
-    def set_date(self, id, date) -> bool:
+    def set_visit_date(self, id) -> bool:
         with self._session_scope() as session:
-            user = session.query(CasinoDodepDates).filter_by(id=id).first()
-            user.date = date
+            user = session.query(CasinoUsers).filter_by(id=id).first()
+            user.visit_date = int(datetime.now().timestamp())
             session.commit()
             return True
         return False
 
-
-class VisitorsService:
-    def __init__(self):
-        self.session = sessionmaker(bind=engine, expire_on_commit=False)
-        Base.metadata.create_all(engine)
-
-    @contextmanager
-    def _session_scope(self):
-        """Контекстный менеджер для работы с сессией"""
-        session = self.session()
-        try:
-            yield session
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(str(e))
-        finally:
-            session.close()
-
-    def add_user(self, id) -> bool:
-        with self._session_scope() as session:
-            if not self.get_date(id) is None:
-                return False
-            session.add(CasinoVisitors(id=id))
-            session.commit()
-            return True
-        return False
-
-    def get_date(self, id) -> Optional[list[CasinoVisitors]]:
-        with self._session_scope() as session:
-            return session.query(CasinoVisitors).filter_by(id=id).first()
-
-    def set_date(self, id) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoVisitors).filter_by(id=id).first()
-            if user is None:
-                self.add_user(id)
-                session.commit()
-                user = session.query(CasinoVisitors).filter_by(id=id).first()
-            user.date = int(datetime.now().timestamp())
-            session.commit()
-            return True
-        return False
-
-    def get_list(self) -> Optional[list[CasinoVisitors]]:
+    def get_visit_list(self) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
             return (
-                session.query(CasinoVisitors)
-                .where(CasinoVisitors.date >= datetime.now().timestamp() - 300)
+                session.query(CasinoUsers)
+                .where(CasinoUsers.visit_date >= datetime.now().timestamp() - 300)
                 .all()
             )
 

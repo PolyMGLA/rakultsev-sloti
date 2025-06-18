@@ -15,20 +15,8 @@ class CasinoUsers(Base):
     balance = Column("balance", Integer, default=100)
     slots_num = Column("slots_num", Integer, default=0)
     dodep_num = Column("dodep_num", Integer, default=0)
-    dodeps = relationship(
-        "CasinoDodepDates",
-        back_populates="user",
-        uselist=False,
-        cascade="all, delete-orphan",
-        lazy="joined",
-    )
-    visitors = relationship(
-        "CasinoVisitors",
-        back_populates="user",
-        uselist=False,
-        cascade="all, delete-orphan",
-        lazy="joined",
-    )
+    dodep_date = Column("dodep_date", Integer, default=0)
+    visit_date = Column("visit_date", Integer, default=0)
     gifts = relationship(
         "CasinoGifts",
         back_populates="user",
@@ -41,20 +29,6 @@ class CasinoUsers(Base):
         cascade="all, delete-orphan",
         lazy="joined",
     )
-
-
-class CasinoDodepDates(Base):
-    __tablename__ = "dates"
-    id = Column("id", Integer, ForeignKey("users.id"), primary_key=True)
-    date = Column("date", Integer, default=0)
-    user = relationship("CasinoUsers", back_populates="dodeps", lazy="joined")
-
-
-class CasinoVisitors(Base):
-    __tablename__ = "visitors"
-    id = Column("id", Integer, ForeignKey("users.id"), primary_key=True)
-    date = Column("date", Integer, default=0)
-    user = relationship("CasinoUsers", back_populates="visitors", lazy="joined")
 
 
 class CasinoGifts(Base):

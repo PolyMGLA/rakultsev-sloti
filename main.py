@@ -4,9 +4,9 @@ import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import types, F
-from aiogram.filters import Command, or_f
+from aiogram.filters import Command, CommandObject, or_f
 
-from db import db, dt, dv, utils
+from db import db, utils
 from tasks import credits_task
 import routes.slots
 import routes.admins
@@ -29,10 +29,19 @@ TODO:
 
 
 @dp.message(Command("start"))
-async def gay_start(msg: types.Message):
+async def gay_start(msg: types.Message, command: CommandObject):
     """
     Регистрация пользователя (попытка зарегать)
     """
+    args = None
+    try:
+        args = int(command.args)
+        user = db.get_user(args)
+        if not user is None:
+            db.update_bal(user.id, user.balance + 150)
+    except (ValueError, TypeError):
+        pass
+    
 
     if utils.init_user(msg):
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
@@ -45,9 +54,9 @@ async def gay_visitors(msg: types.Message):
     """
     Список пользователей, которые активничали последнюю минуту
     """
-    vis = dv.get_list()
+    vis = db.get_visit_list()
     await msg.answer(
-        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.user.prefix}{el.user.name}" for el in vis])
+        f"В казино: {len(vis)} человек\n" + "\n".join([f"{el.prefix}{el.name}" for el in vis])
     )
 
 
@@ -86,7 +95,7 @@ async def gay_dodep(msg: types.Message):
     if user.balance < 2:
 
         tdt = int(datetime.now().timestamp())
-        last_dodep = dt.get_date(msg.from_user.id).date
+        last_dodep = db.get_dodep_date(msg.from_user.id).date
         timeout = 600 - 10 * db.get_bal(msg.from_user.id)
         if tdt - last_dodep < timeout:
             await msg.answer(
@@ -96,7 +105,7 @@ async def gay_dodep(msg: types.Message):
             if (
                 db.update_bal(msg.from_user.id, 100)
                 and db.add_dodep(msg.from_user.id)
-                and dt.set_date(msg.from_user.id, tdt)
+                and db.set_dodep_date(msg.from_user.id, tdt)
             ):
                 await msg.answer("додеп прошел")
             else:

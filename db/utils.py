@@ -1,11 +1,11 @@
-from db import db, dt, dv, dg
+from db import db, dg
 
 
 def init_user(msg) -> bool:
     """
     Инициализация пользователя в таблицах базы
     """
-    x = not db.register(
+    return db.register(
         msg.from_user.id,
         (
             ("@" + msg.from_user.username)
@@ -13,16 +13,13 @@ def init_user(msg) -> bool:
             else msg.from_user.full_name
         ),
     )
-    y = not dt.add_user(msg.from_user.id)
-    z = not dv.add_user(msg.from_user.id)
-    return not (x or y or z)
 
 
 def update_visit(msg):
     """
     Обновление даты последнего посещения казино
     """
-    return dv.set_date(msg.from_user.id)
+    return db.set_visit_date(msg.from_user.id)
 
 
 def profile(id: int):
@@ -39,4 +36,5 @@ def profile(id: int):
         + f"\nДодепов: {user.dodep_num}"
         + f"\n\n- Подарков: {len(gifts)} -\n"
         + "\n".join(f'{el.gift_name} #{el.gift_id} - "{el.descr}"' for el in gifts)
+        + f"\n\nСсылка для друзей (+150🪙): https://t.me/rakultsev_sloti_bot?start={user.id}"
     )

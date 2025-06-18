@@ -1,7 +1,5 @@
-from db.service import UserService, DodepService, VisitorsService, GiftsService, CreditsService
+from db.service import UserService, GiftsService, CreditsService
 
 db = UserService()
-dt = DodepService()
-dv = VisitorsService()
 dg = GiftsService()
 dc = CreditsService()
