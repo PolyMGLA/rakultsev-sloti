@@ -1,5 +1,5 @@
 import sqlalchemy as sosal
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -14,6 +14,7 @@ class CasinoUsers(Base):
     prefix = Column("prefix", String, default="")
     balance = Column("balance", Integer, default=100)
     slots_num = Column("slots_num", Integer, default=0)
+    blackjack_num = Column("blackjack_num", Integer, default=0)
     dodep_num = Column("dodep_num", Integer, default=0)
     dodep_date = Column("dodep_date", Integer, default=0)
     visit_date = Column("visit_date", Integer, default=0)
@@ -37,6 +38,7 @@ class CasinoGifts(Base):
     user_id = Column("user_id", Integer, ForeignKey("users.id"))
     gift_type = Column("gift_type", String, nullable=False)
     gift_name = Column("gift_name", String, nullable=False)
+    show_gift = Column("show_gift", Boolean, nullable=False)
     descr = Column("descr", String, default="")
     user = relationship("CasinoUsers", back_populates="gifts", lazy="joined")
 
@@ -47,6 +49,7 @@ class CasinoCredits(Base):
     user_id = Column("user_id", Integer, ForeignKey("users.id"))
     sum = Column("sum", Integer, nullable=False)
     perc = Column("perc", Integer, nullable=False)
+    cred_period = Column("cred_period", Integer, default=86400)
     next_date = Column("next_date", Integer, nullable=False)
     last_date = Column("last_date", Integer, nullable=False)
     user = relationship("CasinoUsers", back_populates="credits", lazy="joined")

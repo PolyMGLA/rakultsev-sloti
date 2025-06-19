@@ -44,6 +44,14 @@ class UserService:
             session.commit()
             return True
         return False
+    
+    def remove_user(self, id: int) -> bool:
+        with self._session_scope() as session:
+            session.query(CasinoUsers).where(CasinoUsers.id==id).delete()
+            session.commit()
+            return True
+        return False
+
 
     def get_user(self, id: int) -> Optional[CasinoUsers]:
         with self._session_scope() as session:
@@ -153,14 +161,19 @@ class GiftsService:
         with self._session_scope() as session:
             return session.query(CasinoGifts).all()
         return []
-
-    def get_user_gifts(self, user_id: int) -> list[CasinoGifts]:
+    
+    def get_typed_gifts(self, gift_type: str) -> list[CasinoGifts]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).filter_by(user_id=user_id).all()
+            return session.query(CasinoGifts).where(CasinoGifts.gift_type == gift_type).all()
+        return []
+
+    def get_user_gifts(self, user_id: int, show_gift=True) -> list[CasinoGifts]:
+        with self._session_scope() as session:
+            return session.query(CasinoGifts).filter_by(user_id=user_id, show_gift=show_gift).all()
         return []
 
     def add_gift(
-        self, user_id: int, gift_type: str, gift_name: str, descr: str = ""
+        self, user_id: int, gift_type: str, gift_name: str, descr: str = "", show_gift: bool = True
     ) -> bool:
         with self._session_scope() as session:
             session.add(
@@ -169,6 +182,7 @@ class GiftsService:
                     gift_type=gift_type,
                     gift_name=gift_name,
                     descr=descr,
+                    show_gift=show_gift,
                 )
             )
             session.commit()
@@ -191,8 +205,8 @@ class GiftsService:
             return True
         return False
 
-    def has_gift(self, user_id: int, gift_type: str) -> bool:
-        gifts = self.get_user_gifts(user_id)
+    def has_gift(self, user_id: int, gift_type: str, show_gift: bool = True) -> bool:
+        gifts = self.get_user_gifts(user_id, show_gift=show_gift)
         for g in gifts:
             if g.gift_type == gift_type:
                 return True
@@ -255,8 +269,20 @@ class CreditsService:
             return True
         return False
 
+    def update_last_date(self, credit_id: int, last_date: int) -> bool:
+        with self._session_scope() as session:
+            cred = (
+                session.query(CasinoCredits)
+                .where(CasinoCredits.credit_id == credit_id)
+                .first()
+            )
+            cred.last_date = last_date
+            session.commit()
+            return True
+        return False
+
     def add_credit(
-        self, user_id: int, sum: int, perc: int, next_date: int, last_date: int
+        self, user_id: int, sum: int, perc: int, next_date: int, last_date: int, cred_period: int = 86400
     ) -> bool:
         with self._session_scope() as session:
             session.add(
@@ -266,6 +292,7 @@ class CreditsService:
                     perc=perc,
                     next_date=next_date,
                     last_date=last_date,
+                    cred_period=cred_period,
                 )
             )
             session.commit()

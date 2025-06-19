@@ -24,7 +24,7 @@ class MacDonaldsBox(Gift):
         user = db.get_user(msg.from_user.id)
         ch = randint(1, 50)
 
-        if ch == 1 and db.update_bal(user.id, user.balance - 1000):
+        if ch == 1 and db.update_bal(user.id, user.balance - 2000):
             # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
             await msg.answer("Выпало: проверь баланс")
         elif (

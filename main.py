@@ -1,24 +1,23 @@
 # импорт всякой залупы
 import asyncio
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from aiogram import types, F
 from aiogram.filters import Command, CommandObject, or_f
 
-from db import db, utils
+from db import db, dc, utils
 from tasks import credits_task
 import routes.slots
 import routes.admins
 import routes.blackjack
 import routes.shop
+import routes.credits
 from routes.keyboards import *
 from messages import HELP, RULES
 from middlewares.telegram import TGMiddleWare
 
 from datetime import datetime
 
-from bot import bot, dp
+from bot import bot, dp, scheduler
 
 """
 TODO:
@@ -43,9 +42,9 @@ async def gay_start(msg: types.Message, command: CommandObject):
         if not args is None:
             user = db.get_user(args)
             if not user is None:
-                db.update_bal(user.id, user.balance + 150)
+                db.update_bal(user.id, user.balance + 100)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
-        db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + 150)
+        db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + 100)
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
@@ -168,7 +167,6 @@ async def gay_back(msg: types.Message):
 
 async def main():
     print("starting bot..")
-    scheduler = AsyncIOScheduler()
 
     dp.message.middleware(TGMiddleWare())
 
@@ -176,8 +174,10 @@ async def main():
     dp.include_router(routes.slots.router)
     dp.include_router(routes.blackjack.router)
     dp.include_router(routes.shop.router)
+    dp.include_router(routes.credits.router)
 
-    scheduler.add_job(credits_task, "interval", minutes=1)
+    await credits_task()
+    scheduler.add_job(credits_task, "interval", seconds=15)
 
     scheduler.start()
     await dp.start_polling(bot)

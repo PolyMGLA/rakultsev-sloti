@@ -21,6 +21,11 @@ ADMIN_HELP = """
 /gift <gift_id> - получить подарок по id
 /gifts_list - вывести все подарки
 /remove_gift <gift_id> - удалить подарок по id
+/credit <credit_id> - получить кредит по id
+/credit_list - список всех кредитов
+/exec <command> - выполнить команду Python
+
+/exit - !!!ОСТОРОЖНО!!! реально вырубает бота
 
 доступно только:
 @ya_blinchik, @Luckich000

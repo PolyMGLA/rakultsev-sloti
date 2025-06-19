@@ -6,7 +6,7 @@ from datetime import datetime
 from messages import DONATE
 from middlewares.telegram import TGMiddleWare
 from db import db, dc
-from shop import gifts
+from shop import gifts, promos
 
 router = Router()
 router.message.middleware(TGMiddleWare())
@@ -31,6 +31,7 @@ def get_shop_keyboard():
                 types.KeyboardButton(text=gifts[2].shop_cap()),
                 types.KeyboardButton(text=gifts[3].shop_cap()),
             ],
+            [types.KeyboardButton(text="💰кредиты💳")],
             [types.KeyboardButton(text="🔙Назад🔙")],
         ],
         resize_keyboard=True,
@@ -67,11 +68,10 @@ for gift in gifts:
             await msg.answer("все распродано.")
 
 
-@router.message(Command("credit"))
-async def gay_credit(msg: types.Message, command: CommandObject):
-    now = datetime.now().timestamp()
-    if dc.add_credit(msg.from_user.id, 100, 50, now + 10, now + 70):
-        await msg.answer("кредит взяли")
+@router.message(F.text.startswith("#"))
+async def gay_promo(msg: types.Message):
+    if msg.text in promos and promos[msg.text].can_buy(msg.from_user.id):
+        await promos[msg.text].open(msg)
 
 
 @router.message(F.text.lower() == "💸донат админам💸")

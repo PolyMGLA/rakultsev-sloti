@@ -36,5 +36,5 @@ def profile(id: int):
         + f"\nДодепов: {user.dodep_num}"
         + f"\n\n- Подарков: {len(gifts)} -\n"
         + "\n".join(f'{el.gift_name} #{el.gift_id} - "{el.descr}"' for el in gifts)
-        + f"\n\nСсылка для друзей (+150🪙): https://t.me/rakultsev_sloti_bot?start={user.id}"
+        + f"\n\nСсылка для друзей (+100🪙): https://t.me/rakultsev_sloti_bot?start={user.id}"
     )
