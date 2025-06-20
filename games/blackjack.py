@@ -35,20 +35,20 @@ RULES = """
 В такой ситуации все остаются при своих ставках, никто не выигрывает и не проигрывает
 """
 
-cards = ["2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🔟", "🔟", "🔟", "🃏"]
-znach = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]
+cards = ["1️⃣","2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🔟", "🔟", "🔟", "🃏"]
+znach = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]
 close = ["🎁"]
 
 
 def shuffle() -> list[str]:
-    arr = cards * 4
+    arr = cards[1:] * 4
     utils.shuffle(arr)
     return arr
 
 async def get_sum(state: FSMContext, arg: str) -> int:
     sum_ = 0
     cards_ = (await state.get_data())[arg]
-    if sorted(cards_) == sorted(["🔟", "🃏"]):
+    if sorted(cards_) == ["🔟", "🃏"]:
         return 87 #блэкджек
     for card in cards_:
         sum_ += znach[cards.index(card)]

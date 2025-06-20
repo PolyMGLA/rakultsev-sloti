@@ -1,7 +1,7 @@
 from aiogram import types, F, Router
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-
+import asyncio
 from games import blackjack
 from routes.keyboards import blackjack_keyboard, blackjack_game_keyboard, test_keyboard
 from db import db
@@ -10,7 +10,7 @@ from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
 router = Router()
 router.message.middleware(TGMiddleWare())
 router.message.middleware(TGAdminMiddleWare())
-
+schet = 0
 class BlackjackState(StatesGroup):
     sum = State()
     cards_arr = State()
@@ -90,17 +90,35 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
     user_sum = (await state.get_data())["sum"]
     my_cards = (await state.get_data())['my_cards']
     dealer_cards = (await state.get_data())['dealer_cards']
+    user_score = await blackjack.get_sum(state, "my_cards")
     await msg.answer(
         f"Ваша ставка: {user_sum}\n"
         + f"Ваши карты: {' '.join(my_cards)}\n"
-        + f"Карты дилера: {' '.join(dealer_cards)}",
+        + f"Карты дилера: {' '.join(dealer_cards)}\n"
+        + f"Ваш счет: {user_score}",
         reply_markup=blackjack_game_keyboard
         )
-    
-    if await blackjack.get_sum(state, "my_cards") > 21 \
-        and "🃏" not in my_cards \
-        and db.update_bal(
-            msg.from_user.id,
-            db.get_bal(msg.from_user.id) - user_sum
-            ):
+    if await blackjack.get_sum(state, "my_cards") == 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + user_sum):
+        await msg.answer("вы победили\n Ваш итоговый счет: 21", reply_markup=test_keyboard)
+        return
+    elif await blackjack.get_sum(state, "my_cards") > 21 and "🃏" in my_cards:
+        for i in range(len(my_cards)):
+            if my_cards[i] == "🃏":
+                my_cards[i] = "1️⃣"
+                user_score = await blackjack.get_sum(state, "my_cards")
+                break
+        await msg.answer("Ваше количество очков превысила 21\n Ваш туз превращается в единичку\n Новые Данные:")
+        await msg.answer(
+        f"Ваша ставка: {user_sum}\n"
+        + f"Ваши карты: {' '.join(my_cards)}\n"
+        + f"Карты дилера: {' '.join(dealer_cards)}\n"
+        + f"Ваш счет: {user_score}",
+        reply_markup=blackjack_game_keyboard
+        )
+        if await blackjack.get_sum(state, "my_cards") == 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + user_sum):
+            await msg.answer("вы победили\n Ваш итоговый счет: 21", reply_markup=test_keyboard)
+            return
+        return
+    elif await blackjack.get_sum(state, "my_cards") > 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) - user_sum):
         await msg.answer("Вы проебали!", reply_markup=test_keyboard)
+        await msg.answer("Ваш итоговый счет:", blackjack.get_sum(state,"my_cards"))
