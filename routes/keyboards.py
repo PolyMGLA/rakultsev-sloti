@@ -116,3 +116,12 @@ credits_keyboard = types.ReplyKeyboardMarkup(
     resize_keyboard=True,
     input_field_placeholder="Выберите что хотите сделать",
 )
+
+
+blackjack_game_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [types.KeyboardButton(text="🃏взять карту")],
+        [types.KeyboardButton(text="🛑стоп")],
+        [types.KeyboardButton(text="🏳️сдаться")],
+    ]
+)
