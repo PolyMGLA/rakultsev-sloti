@@ -7,3 +7,6 @@ def randint(a: int, b: int):
 
 def choice(x: list):
     return x[randint(0, len(x) - 1)]
+
+def shuffle(x: list):
+    random.shuffle(x)
