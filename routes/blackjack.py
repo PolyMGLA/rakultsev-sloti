@@ -117,8 +117,22 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
         )
         if await blackjack.get_sum(state, "my_cards") == 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + user_sum):
             await msg.answer("вы победили\n Ваш итоговый счет: 21", reply_markup=test_keyboard)
+            await state.clear()
             return
         return
     elif await blackjack.get_sum(state, "my_cards") > 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) - user_sum):
-        await msg.answer("Вы проебали!", reply_markup=test_keyboard)
-        await msg.answer("Ваш итоговый счет:", blackjack.get_sum(state,"my_cards"))
+        await msg.answer("Вы проиграли!", reply_markup=test_keyboard)
+        await msg.answer("Ваш итоговый счет:", await blackjack.get_sum(state, "my_cards"))
+        await state.clear()
+    elif await blackjack.get_sum(state, "my_cards") == 87 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + int(1.5 * user_sum)):
+        await msg.answer("Блэкджек!", reply_markup=test_keyboard)
+        await state.clear()
+
+
+@router.message(F.text == "🛑стоп")
+async def gay_stop(msg: types.Message, state: FSMContext):
+    await blackjack.add_card(state, "my_cards")
+    user_sum = (await state.get_data())["sum"]
+    my_cards = (await state.get_data())['my_cards']
+    dealer_cards = (await state.get_data())['dealer_cards']
+    user_score = await blackjack.get_sum(state, "my_cards")
