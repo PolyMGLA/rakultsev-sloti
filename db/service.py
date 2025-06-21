@@ -60,40 +60,16 @@ class UserService:
     def users_list(self) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
             return session.query(CasinoUsers).all()
-
-    def get_bal(self, id: int) -> bool | int:
+        
+    def get(self, id: int, arg: str):
         with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first().balance
-        return False
+            return getattr(session.query(CasinoUsers).filter_by(id=id).first(), arg)
 
-    def update_bal(self, id: int, newbal: int) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.balance = newbal
-            session.commit()
-            return True
-        return False
-
-    def update_prefix(self, id: int, prefix: str) -> bool:
+    def update(self, id: int, **kwargs) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.prefix = prefix
-            session.commit()
-            return True
-        return False
-
-    def add_slot(self, id: int) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.slots_num += 1
-            session.commit()
-            return True
-        return False
-
-    def add_dodep(self, id: int) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.dodep_num += 1
+            for arg in kwargs:
+                setattr(user, arg, kwargs[arg])
             session.commit()
             return True
         return False
@@ -105,26 +81,6 @@ class UserService:
                 .order_by(getattr(CasinoUsers, attr))
                 .all()[-n:][::-1]
             )
-
-    def get_dodep_date(self, id) -> Optional[CasinoUsers]:
-        with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first().dodep_date
-
-    def set_dodep_date(self, id, date) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.dodep_date = date
-            session.commit()
-            return True
-        return False
-
-    def set_visit_date(self, id) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.visit_date = int(datetime.now().timestamp())
-            session.commit()
-            return True
-        return False
 
     def get_visit_list(self) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:

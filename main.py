@@ -42,9 +42,9 @@ async def gay_start(msg: types.Message, command: CommandObject):
         if not args is None:
             user = db.get_user(args)
             if not user is None:
-                db.update_bal(user.id, user.balance + 100)
+                db.update(user.id, balance=user.balance + 100)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
-        db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + 100)
+        db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + 100)
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
@@ -92,21 +92,19 @@ async def gay_dodep(msg: types.Message):
     """
     Функция для пополнения баланса на аккаунте (собственно говоря, додеп)
     """
-    user = db.get_user(msg.from_user.id)
-    if user.balance < 2:
-
+    if db.get(msg.from_user.id, "balance") < 2:
         tdt = int(datetime.now().timestamp())
-        last_dodep = db.get_dodep_date(msg.from_user.id)
-        timeout = 600 - 10 * db.get_bal(msg.from_user.id)
+        last_dodep = db.get(msg.from_user.id, "dodep_date")
+        timeout = 600 - 10 * db.get(msg.from_user.id, "balance")
         if tdt - last_dodep < timeout:
             await msg.answer(
                 f"подождите {(timeout - tdt + last_dodep) // 60} минут {(timeout - tdt + last_dodep) % 60} секунд"
             )
         else:
             if (
-                db.update_bal(msg.from_user.id, 100)
-                and db.add_dodep(msg.from_user.id)
-                and db.set_dodep_date(msg.from_user.id, tdt)
+                db.update(msg.from_user.id, balance=100)
+                and db.update(msg.from_user.id, dodep_num=db.get(msg.from_user.id, "dodep_num") + 1)
+                and db.update(msg.from_user.id, dodep_date=tdt)
             ):
                 await msg.answer("додеп прошел")
             else:

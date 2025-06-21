@@ -1,5 +1,6 @@
 from db import db, dg
 
+from datetime import datetime
 
 def init_user(msg) -> bool:
     """
@@ -19,7 +20,7 @@ def update_visit(msg):
     """
     Обновление даты последнего посещения казино
     """
-    return db.set_visit_date(msg.from_user.id)
+    return db.update(msg.from_user.id, visit_date=int(datetime.now().timestamp()))
 
 
 def profile(id: int):

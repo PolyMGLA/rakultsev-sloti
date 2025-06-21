@@ -57,8 +57,8 @@ for gift in gifts:
     async def gay_gift(msg: types.Message, gift=gift):
         user = db.get_user(msg.from_user.id)
         if gift.can_buy(msg.from_user.id):
-            if user.balance >= gift.cost and db.update_bal(
-                msg.from_user.id, user.balance - gift.cost
+            if user.balance >= gift.cost and db.update(
+                msg.from_user.id, balance=user.balance - gift.cost
             ):
                 await msg.answer(f"Куплено: {gift.giftname}")
                 await gift.open(msg)

@@ -1,5 +1,6 @@
 from games import utils
 from routes.utils import send_news
+from db import db, dg
 
 RULES = """
 - Правила игры в Слоты -
@@ -44,11 +45,11 @@ def secret_regen():
 secret_regen()
 
 
-async def spin(db, dg, id: int) -> str:
+async def spin(id: int) -> str:
     global SECRET
 
     s = _spin(fruits_weighted)
-    bal = db.get_bal(id)
+    bal = db.get(id, "balance")
     newbal = bal - 2
     comb = ""
 
@@ -115,7 +116,7 @@ async def spin(db, dg, id: int) -> str:
                 comb += "2 черепа; "
     if not comb:
         comb = "ничего"
-    if db.update_bal(id, newbal) and db.add_slot(id):
+    if db.update(id, balance=newbal) and db.update(id, slots_num=db.get(id, "slots_num") + 1):
         return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

@@ -95,7 +95,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     if command.args is None:
         await msg.answer("ашипка: напишите айди человека\n /balance <айди>")
     else:
-        await msg.answer(f"{db.get_bal(command.args)}")
+        await msg.answer(f"{db.get(command.args, 'balance')}")
 
 
 @router.message(Command("set_balance"))
@@ -114,7 +114,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
             "/set_balance <id> <balance>"
         )
         return
-    await msg.answer(f"{db.update_bal(id, ball)}")
+    await msg.answer(f"{db.update(id, balance=ball)}")
 
 
 @router.message(Command("user"))
@@ -178,7 +178,7 @@ async def gay_credit_list(msg: types.Message):
 
 @router.message(Command("exec"))
 async def gay_exec(msg: types.Message, command: CommandObject):
-    if command.args is None:
+    if command.args is None or True:
         await msg.answer("Введите команду в формате \"/exec 1\"")
     else:
         try:

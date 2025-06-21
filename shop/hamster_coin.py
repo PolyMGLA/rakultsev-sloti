@@ -31,7 +31,7 @@ class HamsterCoin(Gift):
                 f"тап-тап-тап по хомяку (куплено по курсу {c})",
             )
 
-        if db.update_bal(user.id, user.balance + c):
+        if db.update(user.id, balance=user.balance + c):
             await msg.answer(
                 f"Текущий курс монеты: {c}\nТекущий баланс: {user.balance + c}"
             )

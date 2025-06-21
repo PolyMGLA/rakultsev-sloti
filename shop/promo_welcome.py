@@ -18,6 +18,6 @@ class PromoWelcome(Gift):
         if dg.has_gift(msg.from_user.id, "promo_welcome", show_gift=False):
             await msg.answer("Промокод уже активирован!")
             return
-        db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + 150)
+        db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + 150)
         dg.add_gift(msg.from_user.id, "promo_welcome", "#welcome", "", show_gift=False)
         await msg.answer("Промокод #welcome успешно применен!")
