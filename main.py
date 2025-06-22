@@ -4,7 +4,7 @@ import asyncio
 from aiogram import types, F
 from aiogram.filters import Command, CommandObject, or_f
 
-from db import db, dc, utils
+from db import db, dc, dg, utils
 from tasks import credits_task
 import routes.slots
 import routes.admins
@@ -18,13 +18,6 @@ from middlewares.telegram import TGMiddleWare
 from datetime import datetime
 
 from bot import bot, dp, scheduler
-
-"""
-TODO:
-Блэкджек
-Магазин
-Кредиты в магазине (берешь кредит на несколько дней/недель, по окончанию срока должен выплатить сумму кредита, иначе через 3 дня на счет начислится минус с большим коэффициентом)
-"""
 
 
 @dp.message(Command("start"))
@@ -125,6 +118,7 @@ async def gay_top(msg: types.Message):
         ["slots_num", "круткам"],
         ["blackjack_num", "играм в блэкджек"],
         ["dodep_num", "додепам"],
+        ["lost_money", "слитым деньгам"]
     ]:
         top = db.topn(5, nom[0])
         res += f"Топ по {nom[1]}:\n"
