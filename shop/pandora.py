@@ -9,7 +9,7 @@ from aiogram import types
 
 async def open(msg: types.Message) -> str:
     user = db.get_user(msg.from_user.id)
-    ch = random.randint(1, 100)
+    ch = random.randint(1, 101)
     if ch in range(1, 30) and db.add(user.id, prefix="🐔"):
         return "Выпало: 🐔курица🐔"
     if ch in range(30, 40) and db.add(user.id, balance=-10, lost_money=10):
