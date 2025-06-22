@@ -48,7 +48,7 @@ def shuffle() -> list[str]:
 async def get_sum(state: FSMContext, arg: str) -> int:
     sum_ = 0
     cards_ = (await state.get_data())[arg]
-    if sorted(cards_) == ["🔟", "🃏"]:
+    if sorted(cards_) == sorted(["🔟", "🃏"]):
         return 87 #блэкджек
     for card in cards_:
         sum_ += znach[cards.index(card)]

@@ -150,7 +150,7 @@ async def gay_menu(msg: types.Message):
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
-    await msg.answer("Временно не работает. Here be blackjack.")
+    await msg.answer("Вы дождались.\nДобро пожаловать в блэкджек", reply_markup=blackjack_keyboard)
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")
