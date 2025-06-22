@@ -24,9 +24,11 @@ async def credits_task():
                 await bot.send_message(cred.user_id, "кредит успешно погашен!")
                 dc.remove_credit(cred.credit_id)
             elif cred.last_date <= tekd:
+                sm = cred.sum * 5 * len(dc.get_user_credits(cred.user_id))
                 db.update(
                     cred.user_id,
-                    balance=cred.user.balance - cred.sum * 5 * len(dc.get_user_credits(cred.user_id)),
+                    balance=-sm,
+                    lost_money=sm
                 )
                 dc.remove_credit(cred.credit_id)
                 await bot.send_message(

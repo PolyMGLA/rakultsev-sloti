@@ -52,10 +52,13 @@ async def spin(id: int) -> str:
     s = _spin(fruits_weighted)
     bal = db.get(id, "balance")
     newbal = bal - 2
+    lost = 0
     comb = ""
 
     if s == SECRET:
-        newbal += random.randint(a=-1000, b=1000)
+        cost = random.randint(a=-1000, b=1000)
+        newbal += cost
+        if cost < 0: lost -= cost
         comb += "secret; "
         user = db.get_user(id)
         await send_news(
@@ -80,6 +83,7 @@ async def spin(id: int) -> str:
             comb = "🍒Мама! Я спелая вишня🍒"
         case "🍍🍍🍍":
             newbal -= 30
+            lost += 30
             comb = "идешь в ананас"
         case "🍑🍑🍑":
             newbal += 40
@@ -91,13 +95,16 @@ async def spin(id: int) -> str:
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} - absolute sigma!!")
         case "💀💀💀":
+            lost += 5000
             newbal -= 5000
             comb = "Вы проиграли хату"
             dg.add_gift(id, "dead", "💀Игрушечный череп", "проиграл все")
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} проиграл семью в казино")
         case "🍌🍑🍌":
-            newbal += random.randint(-50, 50)
+            cost = random.randint(-50, 50)
+            if cost < 0: lost -= cost
+            newbal += cost
             comb = "Пайпер Перри..?"
         case _:
             if s.count("🍑") == 2 and s.count("🍍") == 1:
@@ -110,14 +117,16 @@ async def spin(id: int) -> str:
                 newbal += 100
                 comb += "2 радуги; "
             if s.count("💀") == 1:
+                lost += 10
                 newbal -= 10
                 comb += "1 череп; "
             if s.count("💀") == 2:
+                lost += 100
                 newbal -= 100
                 comb += "2 черепа; "
     if not comb:
         comb = "ничего"
-    if db.update(id, balance=newbal) and db.update(id, slots_num=db.get(id, "slots_num") + 1):
+    if db.update(id, balance=newbal) and db.add(id, slots_num=1, lost_money=lost):
         return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

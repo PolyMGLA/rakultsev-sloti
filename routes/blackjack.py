@@ -102,7 +102,7 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
         + f"Ваш счет: {user_score}",
         reply_markup=blackjack_game_keyboard
         )
-    if await blackjack.get_sum(state, "my_cards") == 21 and db.update_bal(msg.from_user.id, db.get_bal(msg.from_user.id) + user_sum):
+    if await blackjack.get_sum(state, "my_cards") == 21 and db.add(msg.from_user.id, balance=user_sum):
         await msg.answer("вы победили\n Ваш итоговый счет: 21", reply_markup=test_keyboard)
         return
     elif await blackjack.get_sum(state, "my_cards") > 21 and "🃏" in my_cards:
@@ -119,16 +119,16 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
         + f"Ваш счет: {user_score}",
         reply_markup=blackjack_game_keyboard
         )
-        if await blackjack.get_sum(state, "my_cards") == 21 and db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + user_sum):
+        if await blackjack.get_sum(state, "my_cards") == 21 and db.add(msg.from_user.id, balance=user_sum):
             await msg.answer("вы победили\n Ваш итоговый счет: 21", reply_markup=test_keyboard)
             await state.clear()
             return
         return
-    elif await blackjack.get_sum(state, "my_cards") > 21 and db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") - user_sum):
+    elif await blackjack.get_sum(state, "my_cards") > 21 and db.add(msg.from_user.id, balance=-user_sum):
         await msg.answer("Вы проиграли!", reply_markup=test_keyboard)
         await msg.answer("Ваш итоговый счет:", await blackjack.get_sum(state, "my_cards"))
         await state.clear()
-    elif await blackjack.get_sum(state, "my_cards") == 87 and db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + int(1.5 * user_sum)):
+    elif await blackjack.get_sum(state, "my_cards") == 87 and db.add(msg.from_user.id, balance=int(1.5 * user_sum)):
         await msg.answer("Блэкджек!", reply_markup=test_keyboard)
         await state.clear()
 

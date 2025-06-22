@@ -15,5 +15,5 @@ class PromoEmpty(Gift):
         return f"{self.giftname} ({self.cost}🪙)"
 
     async def open(self, msg: types.Message):
-        if db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") - 50):
+        if db.add(msg.from_user.id, balance=-50):
             await msg.answer("Промокод не может быть пустым. Вот тебе -50🪙 за это")

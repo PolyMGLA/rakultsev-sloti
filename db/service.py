@@ -73,6 +73,15 @@ class UserService:
             session.commit()
             return True
         return False
+    
+    def add(self, id: int, **kwargs) -> bool:
+        with self._session_scope() as session:
+            user = session.query(CasinoUsers).filter_by(id=id).first()
+            for arg in kwargs:
+                setattr(user, arg, getattr(user, arg) + kwargs[arg])
+            session.commit()
+            return True
+        return False
 
     def topn(self, n: int, attr: str) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:

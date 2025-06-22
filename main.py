@@ -42,8 +42,8 @@ async def gay_start(msg: types.Message, command: CommandObject):
         if not args is None:
             user = db.get_user(args)
             if not user is None:
-                db.update(user.id, balance=user.balance + 100)
-                db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + 100)
+                db.add(user.id, 100)
+                db.add(msg.from_user.id, balance=100)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
@@ -103,7 +103,7 @@ async def gay_dodep(msg: types.Message):
         else:
             if (
                 db.update(msg.from_user.id, balance=100)
-                and db.update(msg.from_user.id, dodep_num=db.get(msg.from_user.id, "dodep_num") + 1)
+                and db.add(msg.from_user.id, dodep_num=1)
                 and db.update(msg.from_user.id, dodep_date=tdt)
             ):
                 await msg.answer("додеп прошел")
