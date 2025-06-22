@@ -79,13 +79,19 @@ async def gay_start_game(callback: types.CallbackQuery, state: FSMContext):
     await blackjack.add_card(state, "dealer_cards")
     my_cards = (await state.get_data())['my_cards']
     dealer_cards = (await state.get_data())['dealer_cards']
-
+    user_sum = (await state.get_data())["sum"]
+    user_score = await blackjack.get_sum(state, "my_cards")
+    dealer_score = await blackjack.get_sum(state, "dealer_cards")
     await callback.message.edit_text(
         f"Ваша ставка: {user_value}\n"
         + f"Ваши карты: {' '.join(my_cards)}\n"
-        + f"Карты дилера: 🎁 {' '.join(dealer_cards[1:])}"
+        + f"Карты дилера: 🎁 {' '.join(dealer_cards[1:])}\n"
+        + f"Ваш счет: {user_score}\n"
         )
     await callback.message.answer("Выберите действие", reply_markup=blackjack_game_keyboard)
+    if await blackjack.get_sum(state, "my_cards") == 87 and db.add(callback.from_user.id, balance=int(1.5 * user_sum)):
+        await callback.message.answer("Блэкджек!", reply_markup=test_keyboard)
+        await state.clear()
     
 
 @router.message(and_f(F.text == "🃏взять карту", BlackjackState.sum))
@@ -95,11 +101,13 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
     my_cards = (await state.get_data())['my_cards']
     dealer_cards = (await state.get_data())['dealer_cards']
     user_score = await blackjack.get_sum(state, "my_cards")
+    dealer_score = await blackjack.get_sum(state, "dealer_cards")
     await msg.answer(
         f"Ваша ставка: {user_sum}\n"
         + f"Ваши карты: {' '.join(my_cards)}\n"
         + f"Карты дилера: {' '.join(dealer_cards)}\n"
-        + f"Ваш счет: {user_score}",
+        + f"Ваш счет: {user_score}\n"
+        + f"Счет Дилера:{dealer_score}",
         reply_markup=blackjack_game_keyboard
         )
     if await blackjack.get_sum(state, "my_cards") == 21 and db.add(msg.from_user.id, balance=user_sum):
@@ -116,7 +124,8 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
         f"Ваша ставка: {user_sum}\n"
         + f"Ваши карты: {' '.join(my_cards)}\n"
         + f"Карты дилера: {' '.join(dealer_cards)}\n"
-        + f"Ваш счет: {user_score}",
+        + f"Ваш счет: {user_score}\n"
+        + f"Счет Дилера:{dealer_score}",
         reply_markup=blackjack_game_keyboard
         )
         if await blackjack.get_sum(state, "my_cards") == 21 and db.add(msg.from_user.id, balance=user_sum):
@@ -135,8 +144,74 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
 
 @router.message(F.text == "🛑стоп")
 async def gay_stop(msg: types.Message, state: FSMContext):
-    await blackjack.add_card(state, "my_cards")
     user_sum = (await state.get_data())["sum"]
     my_cards = (await state.get_data())['my_cards']
     dealer_cards = (await state.get_data())['dealer_cards']
     user_score = await blackjack.get_sum(state, "my_cards")
+    dealer_score = await blackjack.get_sum(state, "dealer_cards")
+    await msg.answer(
+        f"Ваша ставка: {user_sum}\n"
+        + f"Ваши карты: {' '.join(my_cards)}\n"
+        + f"Карты дилера: {' '.join(dealer_cards)}\n"
+        + f"Ваш счет: {user_score}\n"
+        + f"Счет Дилера:{dealer_score}",
+        reply_markup=blackjack_game_keyboard
+        )
+    while dealer_score <= 17:
+        await blackjack.add_card(state, "dealer_cards")
+        dealer_score = await blackjack.get_sum(state, "dealer_cards")
+        await msg.answer(
+        f"Ваша ставка: {user_sum}\n"
+        + f"Ваши карты: {' '.join(my_cards)}\n"
+        + f"Карты дилера: {' '.join(dealer_cards)}\n"
+        + f"Ваш счет: {user_score}\n"
+        + f"Счет Дилера:{dealer_score}",
+        reply_markup=blackjack_game_keyboard
+        )
+        if await blackjack.get_sum(state, "dealer_cards") > 21 and "🃏" in dealer_cards:
+            for i in range(len(dealer_cards)):
+                if dealer_cards[i] == "🃏":
+                    dealer_cards[i] = "1️⃣"
+                    dealer_score = await blackjack.get_sum(state, "dealer_cards")
+                    break
+            await msg.answer("Количество очков дилера превысило 21\n Туз Дилера превращается в единичку\n Новые Данные:")
+            await msg.answer(
+            f"Ваша ставка: {user_sum}\n"
+            + f"Ваши карты: {' '.join(my_cards)}\n"
+            + f"Карты дилера: {' '.join(dealer_cards)}\n"
+            + f"Ваш счет: {user_score}\n"
+            + f"Счет Дилера:{dealer_score}",
+            reply_markup=blackjack_game_keyboard
+            )
+            if await blackjack.get_sum(state, "dealer_cards") == 21 and db.add(msg.from_user.id, balance=-user_sum):
+                await msg.answer("вы проиграли\n Дилер набрал 21 очко", reply_markup=test_keyboard)
+                await state.clear()
+                return
+            return
+    if await blackjack.get_sum(state, "dealer_cards") == await blackjack.get_sum(state, "my_cards"):
+        await msg.answer("Ничья", reply_markup=test_keyboard)
+        return
+    elif await blackjack.get_sum(state, "dealer_cards") == 21 and db.add(msg.from_user.id, balance=-user_sum):
+        await msg.answer("вы проиграли\n Дилер набрал 21 очко!", reply_markup=test_keyboard)
+        return
+    elif await blackjack.get_sum(state, "dealer_cards") > 21 and db.add(msg.from_user.id, balance=user_sum):
+        await msg.answer("Вы выйграли!\n счет дилера превысил 21", reply_markup=test_keyboard)
+        await msg.answer("Ваш итоговый счет:", await blackjack.get_sum(state, "my_cards"))
+        await state.clear()
+    elif await blackjack.get_sum(state, "dealer_cards") == 87 and db.add(msg.from_user.id, balance=-user_sum):
+        await msg.answer("У дилера Блэкджек!", reply_markup=test_keyboard)
+        await state.clear()
+    elif await blackjack.get_sum(state, "dealer_cards") > await blackjack.get_sum(state, "my_cards") and db.add(msg.from_user.id, balance=-user_sum):
+        await msg.answer(f"Вы проиграли!\n Ваш счет:{user_score}\n Счет Дилера: {dealer_score}",reply_markup=test_keyboard)
+    elif await blackjack.get_sum(state, "dealer_cards") < await blackjack.get_sum(state, "my_cards") and db.add(msg.from_user.id, balance=user_sum):
+        await msg.answer(f"Вы выйграли!\n Ваш счет:{user_score}\n Счет Дилера: {dealer_score}",reply_markup=test_keyboard)
+    else:
+        await msg.answer("ашипка")
+
+@router.message(F.text == "🏳️сдаться")
+async def gay_exit(msg: types.Message, state: FSMContext):
+    user_sum = (await state.get_data())["sum"]
+    if db.add(msg.from_user.id, balance=-(user_sum/2)):
+        await msg.answer("Вы сдались, вам возвращена половина ставки",reply_markup=test_keyboard)
+    else:
+        await msg.answer("ашипка")
