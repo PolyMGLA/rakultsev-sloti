@@ -1,7 +1,8 @@
 from shop.gift import Gift
-from games.utils import randint
 from routes.utils import send_news
 from db import db
+
+import random
 
 from aiogram import types
 
@@ -22,7 +23,7 @@ class MacDonaldsBox(Gift):
 
     async def open(self, msg: types.Message):
         user = db.get_user(msg.from_user.id)
-        ch = randint(1, 50)
+        ch = random.randint(1, 50)
 
         if ch == 1 and db.update(user.id, balance=user.balance - 2000):
             # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")

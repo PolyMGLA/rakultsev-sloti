@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.context import FSMContext
 
-from games import utils
+import random
 
 RULES = """
 - Правила игры в блекджек -
@@ -42,7 +42,7 @@ close = ["🎁"]
 
 def shuffle() -> list[str]:
     arr = cards[1:] * 4
-    utils.shuffle(arr)
+    random.shuffle(arr)
     return arr
 
 async def get_sum(state: FSMContext, arg: str) -> int:

@@ -1,13 +1,15 @@
 from shop.gift import Gift
-from games import utils, slots
+from games import slots
 from db import db, dg
+
+import random
 
 from aiogram import types
 
 
 async def open(msg: types.Message) -> str:
     user = db.get_user(msg.from_user.id)
-    ch = utils.randint(1, 100)
+    ch = random.randint(1, 100)
     if ch in range(1, 30) and db.update(user.id, prefix="🐔"):
         return "Выпало: 🐔курица🐔"
     if ch in range(30, 40) and db.update(user.id, balance=user.balance - 10):
@@ -21,8 +23,8 @@ async def open(msg: types.Message) -> str:
         users = db.users_list()
         if users is None:
             return "Ошибка %("
-        user = utils.choice(users)
-        num = utils.randint(-50, 75)
+        user = random.choice(users)
+        num = random.randint(-50, 75)
         if db.update(user.id, balance=user.balance + num):
             return f"Выдали случайному игроку {num}🪙"
         return "Ошибка %("
@@ -35,7 +37,7 @@ async def open(msg: types.Message) -> str:
         else:
             return "Выпало: ничего"
     if ch in range(56, 76):
-        num = utils.randint(-200, 150)
+        num = random.randint(-200, 150)
         if db.update(user.id, balance=user.balance + num):
             return f"Выпало: {num}🪙"
         return "Ошибка %("

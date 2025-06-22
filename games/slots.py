@@ -1,4 +1,5 @@
-from games import utils
+import random
+
 from routes.utils import send_news
 from db import db, dg
 
@@ -34,7 +35,7 @@ for i in range(7):
 
 
 def _spin(arr: list[str]) -> str:
-    return "".join(utils.choice(arr) for i in range(3))
+    return "".join(random.choice(arr) for i in range(3))
 
 
 def secret_regen():
@@ -54,7 +55,7 @@ async def spin(id: int) -> str:
     comb = ""
 
     if s == SECRET:
-        newbal += utils.randint(a=-1000, b=1000)
+        newbal += random.randint(a=-1000, b=1000)
         comb += "secret; "
         user = db.get_user(id)
         await send_news(
@@ -96,7 +97,7 @@ async def spin(id: int) -> str:
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} проиграл семью в казино")
         case "🍌🍑🍌":
-            newbal += utils.randint(-50, 50)
+            newbal += random.randint(-50, 50)
             comb = "Пайпер Перри..?"
         case _:
             if s.count("🍑") == 2 and s.count("🍍") == 1:

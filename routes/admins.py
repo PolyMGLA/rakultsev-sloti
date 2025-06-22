@@ -126,7 +126,7 @@ async def gay_profile(msg: types.Message, command: CommandObject):
         await msg.answer("Введите команду в формате /user <id>")
     else:
         msgid = int(command.args)
-        await msg.answer(utils.profile(msgid))
+        await msg.answer(utils.profile(msgid, show_id=True))
 
 
 @router.message(Command("gift"))
@@ -163,35 +163,34 @@ async def gay_gifts_list(msg: types.Message):
 
 @router.message(Command("credit"))
 async def gay_credit(msg: types.Message, command: CommandObject):
-    cred = dc.get_credit(int(command.args))
-    await msg.answer(
-        f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}\nВзят на {cred.user.name} ({cred.user_id})"
-    )
+    await msg.answer(utils.credit(int(command.args), show_user=True))
 
 @router.message(Command("credit_list"))
 async def gay_credit_list(msg: types.Message):
     for cred in dc.get_all_credits():
-        await msg.answer(
-            f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}\nВзят на {cred.user.name} ({cred.user_id})"
-        )
+        await msg.answer(utils.credit(cred.credit_id, show_user=True))
 
 
 @router.message(Command("exec"))
 async def gay_exec(msg: types.Message, command: CommandObject):
-    if command.args is None or True:
+    whitelist_globals = {
+        "__builtins__": {},
+        "db": db,
+        "dg": dg,
+        "dc": dc
+    }
+    if command.args is None:
         await msg.answer("Введите команду в формате \"/exec 1\"")
     else:
         try:
-            await msg.answer(str(eval(command.args)))
+            await msg.answer(str(eval(command.args, whitelist_globals)))
         except Exception as e:
             await msg.answer(str(e))
 
 
 @router.message(Command("exit"))
 async def gay_exit(msg: types.Message, command: CommandObject):
-    if command.args is None:
-        await msg.answer("Напишите \"/exit yes\", если точно хотите выключить бота")
-    elif command.args.strip() != "yes":
+    if command.args is None or command.args.strip() != "yes":
         await msg.answer("Напишите \"/exit yes\", если точно хотите выключить бота")
     else:
         await msg.answer("Выключение бота..")

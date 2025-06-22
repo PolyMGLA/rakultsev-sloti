@@ -1,6 +1,7 @@
 from shop.gift import Gift
-from games.utils import randint
 from db import db, dg
+
+import random
 
 from aiogram import types
 
@@ -21,7 +22,7 @@ class HamsterCoin(Gift):
 
     async def open(self, msg: types.Message):
         user = db.get_user(msg.from_user.id)
-        c = randint(1, 50)
+        c = random.randint(1, 50)
 
         if c <= 5 and not dg.has_gift(msg.from_user.id, "hamster_coin"):
             dg.add_gift(

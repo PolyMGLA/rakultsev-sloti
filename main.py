@@ -43,8 +43,8 @@ async def gay_start(msg: types.Message, command: CommandObject):
             user = db.get_user(args)
             if not user is None:
                 db.update(user.id, balance=user.balance + 100)
+                db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + 100)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
-        db.update(msg.from_user.id, balance=db.get(msg.from_user.id, "balance") + 100)
     else:
         await msg.answer("Регистрация не удалась, поплачь(\n/menu - главное меню")
 
