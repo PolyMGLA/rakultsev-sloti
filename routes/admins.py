@@ -188,6 +188,12 @@ async def gay_exec(msg: types.Message, command: CommandObject):
             await msg.answer(str(e))
 
 
+@router.message(Command("send_db"))
+async def gay_send_db(msg: types.Message):
+    doc = types.FSInputFile("./db.db")
+    await msg.answer_document(doc, caption="База данных")
+
+
 @router.message(Command("exit"))
 async def gay_exit(msg: types.Message, command: CommandObject):
     if command.args is None or command.args.strip() != "yes":

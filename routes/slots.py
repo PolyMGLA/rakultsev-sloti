@@ -10,13 +10,7 @@ router = Router()
 router.message.middleware(TGMiddleWare())
 
 
-@router.message(
-    or_f(
-        F.text.lower() == "✨крутить✨",
-        F.text.lower() == "✨играть✨",
-        Command("slots"),
-    )
-)
+@router.message(or_f(F.text.lower() == "✨крутить✨", Command("slots")))
 async def gay_spin(msg: types.Message):
     """
     Крутим жоска

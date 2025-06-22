@@ -35,6 +35,7 @@ def profile(id: int, show_id: bool = False) -> str:
         + (" (вы в долгах)" if user.balance < 0 else "")
         + f"\nКруток слотов: {user.slots_num}"
         + f"\nДодепов: {user.dodep_num}"
+        + f"\nИгр в Блэкджек: {user.blackjack_num}"
         + f"\nСлито: {user.lost_money}🪙"
         + f"\n\n- Подарков: {len(gifts)} -\n"
         + "\n".join(f'{el.gift_name} #{el.gift_id} - "{el.descr}"' for el in gifts)

@@ -25,14 +25,10 @@ class MacDonaldsBox(Gift):
         user = db.get_user(msg.from_user.id)
         ch = random.randint(1, 50)
 
-        if ch == 1 and db.add(user.id, balance=-2000):
+        if ch == 1 and db.add(user.id, balance=-2000, lost_money=2000):
             # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
             await msg.answer("Выпало: проверь баланс")
-        elif (
-            2 <= ch <= 15
-            and db.add(user.id, balance=-30)
-            and db.add(user.id, prefix="🐔")
-        ):
+        elif 2 <= ch <= 15 and db.add(user.id, balance=-30, lost_money=30, prefix="🐔"):
             await msg.answer("Выпало: 🐔курица🐔 (не приготовленная? -30🪙)")
         elif 16 <= ch <= 24 and db.add(user.id, balance=30):
             await msg.answer("Выпало: 🍗курица🍗 (приготовленная? +30🪙)")
@@ -40,7 +36,7 @@ class MacDonaldsBox(Gift):
             await msg.answer("Выпало: 🍺пиво🍺 (+180🪙)")
         elif 31 <= ch <= 35 and db.add(user.id, balance=90):
             await msg.answer("Выпало: 🍔американский бургер🍔 (+90🪙)")
-        elif 36 <= ch <= 40 and db.add(user.id, balance=-50):
+        elif 36 <= ch <= 40 and db.add(user.id, balance=-50, lost_money=50):
             await msg.answer("Выпало: 🍟картошка платная🍟 (-50🪙)")
         elif 41 <= ch <= 49 and db.add(user.id, balance=1):
             await msg.answer("Выпало: 🍦жидкое🍦 (+1🪙)")

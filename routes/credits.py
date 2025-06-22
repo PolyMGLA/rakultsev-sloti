@@ -93,7 +93,7 @@ async def credit_pay3(msg: types.Message, state: FSMContext):
             user = db.get_user(msg.from_user.id)
             if user.balance >= amount:
                 cred = dc.get_credit((await state.get_data())["credit_id"])
-                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.add(user.id, balance=-amount):
+                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.add(user.id, balance=-amount, lost_money=amount):
                     await msg.answer("успешно!")
                     await state.clear()
                 else:

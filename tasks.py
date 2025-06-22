@@ -25,7 +25,7 @@ async def credits_task():
                 dc.remove_credit(cred.credit_id)
             elif cred.last_date <= tekd:
                 sm = cred.sum * 5 * len(dc.get_user_credits(cred.user_id))
-                db.update(
+                db.add(
                     cred.user_id,
                     balance=-sm,
                     lost_money=sm

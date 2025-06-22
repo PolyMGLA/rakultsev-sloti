@@ -52,7 +52,7 @@ async def spin(id: int) -> str:
     s = _spin(fruits_weighted)
     bal = db.get(id, "balance")
     newbal = bal - 2
-    lost = 0
+    lost = 2
     comb = ""
 
     if s == SECRET:
@@ -91,6 +91,7 @@ async def spin(id: int) -> str:
         case "🌈🌈🌈":
             newbal += 999
             comb = "Absolute cinema"
+            db.add(id, prefix="🌈")
             dg.add_gift(id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} - absolute sigma!!")
@@ -98,6 +99,7 @@ async def spin(id: int) -> str:
             lost += 5000
             newbal -= 5000
             comb = "Вы проиграли хату"
+            db.add(id, prefix="💀")
             dg.add_gift(id, "dead", "💀Игрушечный череп", "проиграл все")
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} проиграл семью в казино")

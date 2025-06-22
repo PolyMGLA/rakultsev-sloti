@@ -123,6 +123,7 @@ async def gay_top(msg: types.Message):
     for nom in [
         ["balance", "счету"],
         ["slots_num", "круткам"],
+        ["blackjack_num", "играм в блэкджек"],
         ["dodep_num", "додепам"],
     ]:
         top = db.topn(5, nom[0])
