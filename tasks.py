@@ -5,7 +5,9 @@ from bot import bot
 from db import db, dc
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 async def credits_task():
     tekd = datetime.now().timestamp()
@@ -18,11 +20,7 @@ async def credits_task():
                 dc.remove_credit(cred.credit_id)
             elif cred.last_date <= tekd:
                 sm = cred.sum * 5 * len(dc.get_user_credits(cred.user_id))
-                db.add(
-                    cred.user_id,
-                    balance=-sm,
-                    lost_money=sm
-                )
+                db.add(cred.user_id, balance=-sm, lost_money=sm)
                 dc.remove_credit(cred.credit_id)
                 await bot.send_message(
                     cred.user_id, "вы просрочили кредит! на ваш счет начислен штраф."

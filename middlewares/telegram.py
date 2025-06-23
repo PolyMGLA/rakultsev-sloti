@@ -8,6 +8,7 @@ import config
 import traceback
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +22,9 @@ class TGMiddleWare(BaseMiddleware):
         utils.update_visit(event)
         try:
             res = await handler(event, data)
-            logger.debug(f"{event.from_user.username} ({event.from_user.id}): {event.text} | {event}")
+            logger.debug(
+                f"{event.from_user.username} ({event.from_user.id}): {event.text} | {event}"
+            )
             return res
         except Exception as e:
             logger.error(str(e) + "\n" + traceback.format_exc())

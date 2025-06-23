@@ -58,7 +58,8 @@ async def spin(id: int) -> str:
     if s == SECRET:
         cost = random.randint(a=-1000, b=1000)
         newbal += cost
-        if cost < 0: lost -= cost
+        if cost < 0:
+            lost -= cost
         comb += "secret; "
         user = db.get_user(id)
         await send_news(
@@ -105,7 +106,8 @@ async def spin(id: int) -> str:
             await send_news(f"{user.prefix}{user.name} проиграл семью в казино")
         case "🍌🍑🍌":
             cost = random.randint(-50, 50)
-            if cost < 0: lost -= cost
+            if cost < 0:
+                lost -= cost
             newbal += cost
             comb = "Пайпер Перри..?"
         case _:

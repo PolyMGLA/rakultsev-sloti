@@ -25,7 +25,7 @@ async def open(msg: types.Message) -> str:
             return "Ошибка %("
         user = random.choice(users)
         num = random.randint(-50, 75)
-        if db.add(user.id, balance=num, lost_money = (0 if num >= 0 else -num)):
+        if db.add(user.id, balance=num, lost_money=(0 if num >= 0 else -num)):
             return f"Выдали случайному игроку {num}🪙"
         return "Ошибка %("
     if ch == 55:
@@ -38,7 +38,7 @@ async def open(msg: types.Message) -> str:
             return "Выпало: ничего"
     if ch in range(56, 76):
         num = random.randint(-200, 150)
-        if db.add(user.id, balance=num, lost_money = (0 if num >= 0 else -num)):
+        if db.add(user.id, balance=num, lost_money=(0 if num >= 0 else -num)):
             return f"Выпало: {num}🪙"
         return "Ошибка %("
     if ch in range(76, 100):

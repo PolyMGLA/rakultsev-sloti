@@ -46,14 +46,13 @@ class UserService:
             session.commit()
             return True
         return False
-    
+
     def remove_user(self, id: int) -> bool:
         with self._session_scope() as session:
-            session.query(CasinoUsers).where(CasinoUsers.id==id).delete()
+            session.query(CasinoUsers).where(CasinoUsers.id == id).delete()
             session.commit()
             return True
         return False
-
 
     def get_user(self, id: int) -> Optional[CasinoUsers]:
         with self._session_scope() as session:
@@ -62,7 +61,7 @@ class UserService:
     def users_list(self) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
             return session.query(CasinoUsers).all()
-        
+
     def get(self, id: int, arg: str):
         with self._session_scope() as session:
             return getattr(session.query(CasinoUsers).filter_by(id=id).first(), arg)
@@ -75,7 +74,7 @@ class UserService:
             session.commit()
             return True
         return False
-    
+
     def add(self, id: int, **kwargs) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
@@ -128,19 +127,32 @@ class GiftsService:
         with self._session_scope() as session:
             return session.query(CasinoGifts).all()
         return []
-    
+
     def get_typed_gifts(self, gift_type: str) -> list[CasinoGifts]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).where(CasinoGifts.gift_type == gift_type).all()
+            return (
+                session.query(CasinoGifts)
+                .where(CasinoGifts.gift_type == gift_type)
+                .all()
+            )
         return []
 
     def get_user_gifts(self, user_id: int, show_gift=True) -> list[CasinoGifts]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).filter_by(user_id=user_id, show_gift=show_gift).all()
+            return (
+                session.query(CasinoGifts)
+                .filter_by(user_id=user_id, show_gift=show_gift)
+                .all()
+            )
         return []
 
     def add_gift(
-        self, user_id: int, gift_type: str, gift_name: str, descr: str = "", show_gift: bool = True
+        self,
+        user_id: int,
+        gift_type: str,
+        gift_name: str,
+        descr: str = "",
+        show_gift: bool = True,
     ) -> bool:
         with self._session_scope() as session:
             session.add(
@@ -249,7 +261,13 @@ class CreditsService:
         return False
 
     def add_credit(
-        self, user_id: int, sum: int, perc: int, next_date: int, last_date: int, cred_period: int = 86400
+        self,
+        user_id: int,
+        sum: int,
+        perc: int,
+        next_date: int,
+        last_date: int,
+        cred_period: int = 86400,
     ) -> bool:
         with self._session_scope() as session:
             session.add(

@@ -2,6 +2,7 @@ from db import db, dg, dc
 
 from datetime import datetime
 
+
 def init_user(msg) -> bool:
     """
     Инициализация пользователя в таблицах базы
@@ -32,10 +33,15 @@ def profile(id: int, show_id: bool = False) -> str:
         return "Вы не зарегистрированы!\n/start"
     return (
         f"- Профиль -"
-        + f"\nПользователь: {user.prefix}{user.name}" + (f" ({user.id})" if show_id else "")
+        + f"\nПользователь: {user.prefix}{user.name}"
+        + (f" ({user.id})" if show_id else "")
         + f"\nБаланс: {user.balance}"
         + (" (вы в долгах)" if user.balance < 0 else "")
-        + (f"\nКредитов: {len(credits)}, на сумму: {sum(map(lambda x: x.sum, credits))}🪙" if len(credits) > 0 else "")
+        + (
+            f"\nКредитов: {len(credits)}, на сумму: {sum(map(lambda x: x.sum, credits))}🪙"
+            if len(credits) > 0
+            else ""
+        )
         + f"\n\nКруток слотов: {user.slots_num}"
         + f"\nДодепов: {user.dodep_num}"
         + f"\nИгр в Блэкджек: {user.blackjack_num}"
@@ -51,6 +57,8 @@ def credit(cred_id: int, show_user: bool = False) -> str:
     cred = dc.get_credit(cred_id)
     if cred is None:
         return ""
-    return f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день." \
-         + f"Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}" \
-         + (f"\nВзят на {cred.user.name} ({cred.user_id})" if show_user else "")
+    return (
+        f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день."
+        + f"Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}"
+        + (f"\nВзят на {cred.user.name} ({cred.user_id})" if show_user else "")
+    )

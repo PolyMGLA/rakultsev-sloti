@@ -29,8 +29,8 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s",
 )
 
-logging.getLogger('apscheduler').propagate = False
-logging.getLogger('aiogram.event').propagate = False
+logging.getLogger("apscheduler").propagate = False
+logging.getLogger("aiogram.event").propagate = False
 
 
 @dp.message(Command("start"))
@@ -130,7 +130,7 @@ async def gay_top(msg: types.Message):
         ["balance", "счету"],
         ["slots_num", "круткам"],
         ["blackjack_num", "играм в блэкджек"],
-        ["dodep_num", "додепам"]
+        ["dodep_num", "додепам"],
     ]:
         top = db.topn(5, nom[0])
         res += f"Топ по {nom[1]}:\n"
@@ -154,7 +154,9 @@ async def gay_menu(msg: types.Message):
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
 async def gay_menu_blackjack(msg: types.Message):
-    await msg.answer("Вы дождались.\nДобро пожаловать в блэкджек", reply_markup=blackjack_keyboard)
+    await msg.answer(
+        "Вы дождались.\nДобро пожаловать в блэкджек", reply_markup=blackjack_keyboard
+    )
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")

@@ -32,6 +32,7 @@ class PayForm(StatesGroup):
     credit = State()
     pay = State()
 
+
 @router.message(F.text.lower() == "💰кредиты💳")
 async def gay_credits(msg: types.Message):
     await msg.answer(
@@ -67,7 +68,9 @@ async def gay_credit1(msg: types.Message):
         return
 
     now = datetime.now().timestamp()
-    if dc.add_credit(user.id, 125, 15, now, now + 86400, cred_period=3600) and db.add(user.id, balance=150):
+    if dc.add_credit(user.id, 125, 15, now, now + 86400, cred_period=3600) and db.add(
+        user.id, balance=150
+    ):
         await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
     else:
         await msg.answer("ашипка")
@@ -87,6 +90,7 @@ async def credit_pay1(msg: types.Message, state: FSMContext):
     await msg.answer("Выберите номер кредита, который хотите погасить!")
     await state.set_state(PayForm.credit)
 
+
 @router.message(PayForm.credit)
 async def credit_pay2(msg: types.Message, state: FSMContext):
     if msg.text.isdigit():
@@ -103,6 +107,7 @@ async def credit_pay2(msg: types.Message, state: FSMContext):
         await msg.answer("Выберите кредит из списка ваших кредитов! /pay")
         await state.clear()
 
+
 @router.message(PayForm.pay)
 async def credit_pay3(msg: types.Message, state: FSMContext):
     if msg.text.isdigit():
@@ -111,7 +116,9 @@ async def credit_pay3(msg: types.Message, state: FSMContext):
             user = db.get_user(msg.from_user.id)
             if user.balance >= amount:
                 cred = dc.get_credit((await state.get_data())["credit_id"])
-                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.add(user.id, balance=-amount, lost_money=amount):
+                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.add(
+                    user.id, balance=-amount, lost_money=amount
+                ):
                     await msg.answer("успешно!")
                     await state.clear()
                 else:

@@ -6,7 +6,9 @@ from aiogram import types
 
 class PromoWelcome(Gift):
     def __init__(self):
-        super().__init__(giftname="#welcome", cost=0, desc="добро пожаловать в Ракульцев-казино")
+        super().__init__(
+            giftname="#welcome", cost=0, desc="добро пожаловать в Ракульцев-казино"
+        )
 
     def can_buy(self, id: int):
         return len(dg.get_typed_gifts("promo_welcome")) <= 10

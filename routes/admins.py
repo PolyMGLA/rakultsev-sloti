@@ -24,8 +24,7 @@ async def gay_panel(msg: types.Message):
 @router.message(F.text == "📦биржа💰")
 async def gay_marketplace(msg: types.Message):
     await msg.answer(
-        f"Информация о бирже Rakom:"
-        + f"\nКурс HamsterCoin: {data.hamster_course}"
+        f"Информация о бирже Rakom:" + f"\nКурс HamsterCoin: {data.hamster_course}"
     )
 
 
@@ -37,7 +36,9 @@ async def gay_secret_get(msg: types.Message):
     await msg.answer("Секрет: " + slots.SECRET)
 
 
-@router.message(or_f(F.text.lower() == "сгенерировать новый секрет", Command("secret_gen")))
+@router.message(
+    or_f(F.text.lower() == "сгенерировать новый секрет", Command("secret_gen"))
+)
 async def gay_secret_regen(msg: types.Message):
     """
     [ADMIN ONLY] Генерация новой секретной комбинации
@@ -177,9 +178,7 @@ async def gay_find_users(msg: types.Message, command: CommandObject):
         users = db.users_list()
         users = list(filter(lambda x: x.name.startswith(command.args), users))
         if users:
-            await msg.answer(
-                "\n".join(f"{u.name} - {u.id}" for u in users)
-            )
+            await msg.answer("\n".join(f"{u.name} - {u.id}" for u in users))
         else:
             await msg.answer("не найдено")
 
@@ -187,6 +186,7 @@ async def gay_find_users(msg: types.Message, command: CommandObject):
 @router.message(Command("credit"))
 async def gay_credit(msg: types.Message, command: CommandObject):
     await msg.answer(utils.credit(int(command.args), show_user=True))
+
 
 @router.message(Command("credit_list"))
 async def gay_credit_list(msg: types.Message):
@@ -196,14 +196,9 @@ async def gay_credit_list(msg: types.Message):
 
 @router.message(Command("exec"))
 async def gay_exec(msg: types.Message, command: CommandObject):
-    whitelist_globals = {
-        "__builtins__": {},
-        "db": db,
-        "dg": dg,
-        "dc": dc
-    }
+    whitelist_globals = {"__builtins__": {}, "db": db, "dg": dg, "dc": dc}
     if command.args is None:
-        await msg.answer("Введите команду в формате \"/exec 1\"")
+        await msg.answer('Введите команду в формате "/exec 1"')
     else:
         try:
             await msg.answer(str(eval(command.args, whitelist_globals)))
@@ -220,7 +215,7 @@ async def gay_send_db(msg: types.Message):
 @router.message(Command("exit"))
 async def gay_exit(msg: types.Message, command: CommandObject):
     if command.args is None or command.args.strip() != "yes":
-        await msg.answer("Напишите \"/exit yes\", если точно хотите выключить бота")
+        await msg.answer('Напишите "/exit yes", если точно хотите выключить бота')
     else:
         await msg.answer("Выключение бота..")
         await dp.stop_polling()
