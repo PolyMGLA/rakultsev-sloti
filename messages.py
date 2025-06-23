@@ -23,6 +23,7 @@ ADMIN_HELP = """
 /remove_gift <gift_id> - удалить подарок по id
 /credit <credit_id> - получить кредит по id
 /credit_list - список всех кредитов
+/find_users <username> - список всех пользователей, имя которых начинается на username
 /exec <command> - выполнить команду Python
 /send_db - отправить текущую версию бд
 

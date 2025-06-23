@@ -6,9 +6,27 @@ from aiogram.fsm.context import FSMContext
 from datetime import datetime
 
 from db import db, dc
-from routes.keyboards import credits_keyboard
 
 router = Router()
+
+
+def get_keyboard():
+    return types.ReplyKeyboardMarkup(
+        keyboard=[
+            [types.KeyboardButton(text="📜пользовательское соглашение📜")],
+            [
+                types.KeyboardButton(text="125🪙/15% в час/1 день"),
+            ],
+            [
+                types.KeyboardButton(text="💳мои кредиты💰"),
+                types.KeyboardButton(text="💵погасить кредит💵"),
+            ],
+            [types.KeyboardButton(text="💸магазин💸")],
+        ],
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать",
+    )
+
 
 class PayForm(StatesGroup):
     credit = State()
@@ -18,7 +36,7 @@ class PayForm(StatesGroup):
 async def gay_credits(msg: types.Message):
     await msg.answer(
         "Кредиты. Не забудьте прочитать пользовательское соглашение!",
-        reply_markup=credits_keyboard,
+        reply_markup=get_keyboard(),
     )
 
 
@@ -40,7 +58,7 @@ async def gay_my_credits(msg: types.Message):
         )
 
 
-@router.message(F.text.lower() == "150🪙/10% в час/1 день")
+@router.message(F.text.lower() == "125🪙/15% в час/1 день")
 async def gay_credit1(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     credlist = dc.get_user_credits(msg.from_user.id)
@@ -49,7 +67,7 @@ async def gay_credit1(msg: types.Message):
         return
 
     now = datetime.now().timestamp()
-    if dc.add_credit(user.id, 150, 10, now, now + 86400, cred_period=3600) and db.add(user.id, balance=150):
+    if dc.add_credit(user.id, 125, 15, now, now + 86400, cred_period=3600) and db.add(user.id, balance=150):
         await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
     else:
         await msg.answer("ашипка")

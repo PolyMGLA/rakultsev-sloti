@@ -5,14 +5,6 @@ from bot import bot
 from db import db, dc
 
 import logging
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename="logs.log",
-    filemode="a",
-    format="%(asctime)s %(levelname)s %(message)s",
-)
-
 logger = logging.getLogger(__name__)
 
 async def credits_task():
@@ -21,6 +13,7 @@ async def credits_task():
     for cred in credlist:
         try:
             if cred.sum <= 0:
+                logger.info(f"{cred.user_id} погасил кредит {cred.credit_id}")
                 await bot.send_message(cred.user_id, "кредит успешно погашен!")
                 dc.remove_credit(cred.credit_id)
             elif cred.last_date <= tekd:
@@ -34,6 +27,7 @@ async def credits_task():
                 await bot.send_message(
                     cred.user_id, "вы просрочили кредит! на ваш счет начислен штраф."
                 )
+                logger.info(f"{cred.user_id} просрочил кредит {cred.credit_id}")
             elif cred.next_date <= tekd:
                 dc.update_next_date(cred.credit_id, cred.next_date + cred.cred_period)
                 dc.update_sum(cred.credit_id, int(cred.sum * (1 + cred.perc / 100)))

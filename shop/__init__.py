@@ -5,8 +5,9 @@ from shop.hamster_coin import HamsterCoin
 from shop.mcdonalds_box import MacDonaldsBox
 from shop.promo_welcome import PromoWelcome
 from shop.promo_empty import PromoEmpty
+from shop.shotgun import Shotgun
 
-gifts: list[Gift] = [Air(), PandoraBox(), HamsterCoin(), MacDonaldsBox()]
+gifts: list[Gift] = [PandoraBox(), HamsterCoin(), MacDonaldsBox(), Shotgun()]
 
 promos: dict[str, Gift] = {
     "#welcome": PromoWelcome(),

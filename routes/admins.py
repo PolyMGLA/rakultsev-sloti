@@ -10,6 +10,7 @@ from messages import ADMIN_HELP
 from games import slots
 from bot import bot, dp, scheduler
 from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
+from market.data import data
 
 router = Router()
 router.message.middleware(TGMiddleWare())
@@ -19,6 +20,14 @@ router.message.middleware(TGAdminMiddleWare())
 @router.message(F.text.lower() == "📛админ-панель❌")
 async def gay_panel(msg: types.Message):
     await msg.answer("Админ панель включена", reply_markup=admin_keyboard)
+
+
+@router.message(F.text == "📦биржа💰")
+async def gay_marketplace(msg: types.Message):
+    await msg.answer(
+        f"Информация о бирже Rakom:"
+        + f"\nКурс HamsterCoin: {data.hamster_course}"
+    )
 
 
 @router.message(F.text.lower() == "посмотреть секрет")
@@ -159,6 +168,21 @@ async def gay_gifts_list(msg: types.Message):
         await msg.answer(
             f'{gift.gift_name} #{gift.gift_id} - "{gift.descr}"\nВладелец: {gift.user.prefix}{gift.user.name} ({gift.user_id})'
         )
+
+
+@router.message(Command("find_users"))
+async def gay_find_users(msg: types.Message, command: CommandObject):
+    if command.args is None:
+        await msg.answer("Введите команду в формате /find_users <username>")
+    else:
+        users = db.users_list()
+        users = list(filter(lambda x: x.name.startswith(command.args), users))
+        if users:
+            await msg.answer(
+                "\n".join(f"{u.name} - {u.id}" for u in users)
+            )
+        else:
+            await msg.answer("не найдено")
 
 
 @router.message(Command("credit"))

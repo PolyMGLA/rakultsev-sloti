@@ -14,10 +14,23 @@ import routes.credits
 from routes.keyboards import *
 from messages import HELP, RULES
 from middlewares.telegram import TGMiddleWare
+from market.tasks import market_task
+from config import ADMINS
+from bot import bot, dp, scheduler
 
 from datetime import datetime
 
-from bot import bot, dp, scheduler
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename="logs.log",
+    filemode="a",
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+
+logging.getLogger('apscheduler').propagate = False
+logging.getLogger('aiogram.event').propagate = False
 
 
 @dp.message(Command("start"))
@@ -159,6 +172,9 @@ async def gay_back(msg: types.Message):
 
 
 async def main():
+    print("admins:", ADMINS)
+    info = await bot.get_me()
+    print("running bot:", info.username)
     print("starting bot..")
 
     dp.message.middleware(TGMiddleWare())
@@ -170,7 +186,9 @@ async def main():
     dp.include_router(routes.credits.router)
 
     await credits_task()
+    await market_task()
     scheduler.add_job(credits_task, "interval", seconds=15)
+    scheduler.add_job(market_task, "interval", seconds=15)
 
     scheduler.start()
     await dp.start_polling(bot)

@@ -6,14 +6,6 @@ from db import utils
 import config
 
 import logging
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename="logs.log",
-    filemode="a",
-    format="%(asctime)s %(levelname)s %(message)s",
-)
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,9 +17,12 @@ class TGMiddleWare(BaseMiddleware):
         data: Dict[str, Any],
     ):
         utils.update_visit(event)
-        res = await handler(event, data)
-        logger.debug(event)
-        return res
+        try:
+            res = await handler(event, data)
+            logger.debug(event)
+            return res
+        except Exception as e:
+            logger.error(str(e))
 
 
 class TGAdminMiddleWare(BaseMiddleware):

@@ -12,7 +12,7 @@ def init_user(msg) -> bool:
             ("@" + msg.from_user.username)
             if not msg.from_user.username is None
             else msg.from_user.full_name
-        ),
+        )[:30],
     )
 
 
@@ -26,6 +26,8 @@ def update_visit(msg) -> bool:
 def profile(id: int, show_id: bool = False) -> str:
     user = db.get_user(id)
     gifts = dg.get_user_gifts(id)
+    credits = dc.get_user_credits(id)
+    diff = (int(datetime.now().timestamp()) - user.visit_date) // 60
     if user is None or user == False:
         return "Вы не зарегистрированы!\n/start"
     return (
@@ -33,13 +35,15 @@ def profile(id: int, show_id: bool = False) -> str:
         + f"\nПользователь: {user.prefix}{user.name}" + (f" ({user.id})" if show_id else "")
         + f"\nБаланс: {user.balance}"
         + (" (вы в долгах)" if user.balance < 0 else "")
-        + f"\nКруток слотов: {user.slots_num}"
+        + (f"\nКредитов: {len(credits)}, на сумму: {sum(map(lambda x: x.sum, credits))}🪙" if len(credits) > 0 else "")
+        + f"\n\nКруток слотов: {user.slots_num}"
         + f"\nДодепов: {user.dodep_num}"
         + f"\nИгр в Блэкджек: {user.blackjack_num}"
         + f"\nСлито: {user.lost_money}🪙"
         + f"\n\n- Подарков: {len(gifts)} -\n"
         + "\n".join(f'{el.gift_name} #{el.gift_id} - "{el.descr}"' for el in gifts)
         + f"\n\nСсылка для друзей (+100🪙): https://t.me/rakultsev_sloti_bot?start={user.id}"
+        + f"\nВ последний раз был: {diff} минут назад{'🟢' if diff <= 5 else '🔴'}"
     )
 
 

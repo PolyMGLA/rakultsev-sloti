@@ -1,5 +1,6 @@
 from shop.gift import Gift
 from db import db, dg
+from market.data import data
 
 import random
 
@@ -22,9 +23,9 @@ class HamsterCoin(Gift):
 
     async def open(self, msg: types.Message):
         user = db.get_user(msg.from_user.id)
-        c = random.randint(1, 50)
+        c = data.hamster_course
 
-        if c <= 5 and not dg.has_gift(msg.from_user.id, "hamster_coin"):
+        if (c <= 2 or c >= 99) and not dg.has_gift(msg.from_user.id, "hamster_coin"):
             dg.add_gift(
                 msg.from_user.id,
                 "hamster_coin",
