@@ -4,10 +4,8 @@ from aiogram.filters import Command, or_f
 from games import slots
 from db import db, dg
 from games.slots import RULES
-from middlewares.telegram import TGMiddleWare
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 
 
 @router.message(or_f(F.text.lower() == "✨крутить✨", Command("slots")))

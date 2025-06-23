@@ -1,5 +1,5 @@
 from aiogram import Router, types, F
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, or_f
 
 from datetime import datetime
 
@@ -9,11 +9,10 @@ from routes.utils import send_news
 from messages import ADMIN_HELP
 from games import slots
 from bot import bot, dp, scheduler
-from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
+from middlewares.telegram import TGAdminMiddleWare
 from market.data import data
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 router.message.middleware(TGAdminMiddleWare())
 
 
@@ -30,7 +29,7 @@ async def gay_marketplace(msg: types.Message):
     )
 
 
-@router.message(F.text.lower() == "посмотреть секрет")
+@router.message(or_f(F.text.lower() == "посмотреть секрет", Command("secret")))
 async def gay_secret_get(msg: types.Message):
     """
     [ADMIN ONLY] Просмотр секретной комбинации
@@ -38,7 +37,7 @@ async def gay_secret_get(msg: types.Message):
     await msg.answer("Секрет: " + slots.SECRET)
 
 
-@router.message(F.text.lower() == "сгенерировать новый секрет")
+@router.message(or_f(F.text.lower() == "сгенерировать новый секрет", Command("secret_gen")))
 async def gay_secret_regen(msg: types.Message):
     """
     [ADMIN ONLY] Генерация новой секретной комбинации
@@ -58,7 +57,7 @@ async def gay_novost(msg: types.Message, command: CommandObject):
         await send_news(command.args)
 
 
-@router.message(F.text.lower() == "количество участников")
+@router.message(or_f(F.text.lower() == "количество участников", Command("user_num")))
 async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Вывод количества пользователей казика
@@ -68,7 +67,7 @@ async def gay_spisok(msg: types.Message):
         await msg.answer(f"количество участников: {len(users)}")
 
 
-@router.message(F.text.lower() == "список участников")
+@router.message(or_f(F.text.lower() == "список участников", Command("user_list")))
 async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Отправка списка всех участников.
@@ -83,7 +82,7 @@ async def gay_spisok(msg: types.Message):
             await msg.answer(f"{u.prefix}{u.name}, {u.id}")
 
 
-@router.message(F.text.lower() == "тестирование")
+@router.message(or_f(F.text.lower() == "тестирование", Command("test")))
 async def gay_beta(msg: types.Message):
     await msg.answer("панель тестирования включена", reply_markup=test_keyboard)
 

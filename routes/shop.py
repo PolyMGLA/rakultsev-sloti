@@ -4,12 +4,10 @@ from aiogram.filters import or_f, Command, CommandObject
 from datetime import datetime
 
 from messages import DONATE
-from middlewares.telegram import TGMiddleWare
 from db import db, dc
 from shop import gifts, promos
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 
 SHOP_LIST = """- Товары в магазине -\n""" + "\n".join(
     [f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)]

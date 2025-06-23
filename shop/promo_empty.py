@@ -3,6 +3,9 @@ from db import db, dg
 
 from aiogram import types
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class PromoEmpty(Gift):
     def __init__(self):
@@ -16,4 +19,5 @@ class PromoEmpty(Gift):
 
     async def open(self, msg: types.Message):
         if db.add(msg.from_user.id, balance=-50, lost_money=50):
+            logger.info(f"{msg.from_user.id} слил 50 рублей")
             await msg.answer("Промокод не может быть пустым. Вот тебе -50🪙 за это")

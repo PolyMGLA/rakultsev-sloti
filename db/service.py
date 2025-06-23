@@ -11,6 +11,8 @@ from sqlalchemy.orm import sessionmaker
 
 from datetime import datetime
 
+import traceback
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +34,7 @@ class UserService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 
@@ -114,7 +116,7 @@ class GiftsService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 
@@ -192,7 +194,7 @@ class CreditsService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 

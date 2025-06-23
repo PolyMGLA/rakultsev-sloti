@@ -8,10 +8,8 @@ import asyncio
 from games import blackjack
 from routes.keyboards import blackjack_keyboard, blackjack_game_keyboard
 from db import db
-from middlewares.telegram import TGMiddleWare
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 
 
 class BlackjackState(StatesGroup):
@@ -52,6 +50,7 @@ async def update_num_text(message: types.Message, new_value: int):
 
 @router.message(or_f(F.text.lower() == "✨играть✨", Command("blackjack")))
 async def gay_stavka(msg: types.Message, state: FSMContext):
+    await state.clear()
     if db.get(msg.from_user.id, "balance") <= 0:
         await msg.answer("Недостаточно денег.\nБез додепа не обойтись /dodep")
         return

@@ -130,8 +130,7 @@ async def gay_top(msg: types.Message):
         ["balance", "счету"],
         ["slots_num", "круткам"],
         ["blackjack_num", "играм в блэкджек"],
-        ["dodep_num", "додепам"],
-        ["lost_money", "слитым деньгам"]
+        ["dodep_num", "додепам"]
     ]:
         top = db.topn(5, nom[0])
         res += f"Топ по {nom[1]}:\n"
@@ -140,14 +139,11 @@ async def gay_top(msg: types.Message):
         else:
             res += (
                 "\n".join(
-                    [
-                        f"{i + 1}. {top[i].prefix}{top[i].name} - {getattr(top[i], nom[0])}"
-                        for i in range(len(top))
-                    ]
+                    f"{i + 1}. {top[i].prefix}{top[i].name} - {getattr(top[i], nom[0])}"
+                    for i in range(len(top))
                 )
                 + "\n\n"
             )
-
     await msg.answer(res)
 
 
