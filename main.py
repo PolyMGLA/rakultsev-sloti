@@ -48,7 +48,7 @@ async def gay_start(msg: types.Message, command: CommandObject):
         if not args is None:
             user = db.get_user(args)
             if not user is None:
-                db.add(user.id, 100)
+                db.add(user.id, balance=100)
                 db.add(msg.from_user.id, balance=100)
         await msg.answer("Регистрация успешна!\n/menu - главное меню")
     else:
