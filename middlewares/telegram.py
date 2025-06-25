@@ -1,4 +1,5 @@
 from aiogram import types, BaseMiddleware
+import aiogram
 
 from typing import Callable, Dict, Awaitable, Any
 
@@ -26,6 +27,10 @@ class TGMiddleWare(BaseMiddleware):
                 f"{event.from_user.username} ({event.from_user.id}): {event.text} | {event}"
             )
             return res
+        except aiogram.exceptions.TelegramRetryAfter:
+            logger.error("TelegramRetryAfter")
+        except aiogram.exceptions.TelegramForbiddenError:
+            logger.error("TelegramForbiddenError")
         except Exception as e:
             logger.error(str(e) + "\n" + traceback.format_exc())
 

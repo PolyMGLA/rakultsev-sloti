@@ -17,6 +17,9 @@ class HamsterCoin(Gift):
 
     def can_buy(self, id: int):
         return True
+    
+    def description(self) -> str:
+        return f"{self.desc} (курс: {data.hamster_course}🪙)"
 
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"

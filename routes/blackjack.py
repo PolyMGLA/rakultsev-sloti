@@ -251,7 +251,7 @@ async def gay_stop(msg: types.Message, state: FSMContext):
         msg, user_sum, my_cards, dealer_cards, user_score, dealer_score
     )
 
-    while dealer_score <= 17:
+    while dealer_score < 17:
         await blackjack.add_card(state, "dealer_cards")
 
         dealer_cards = (await state.get_data())["dealer_cards"]

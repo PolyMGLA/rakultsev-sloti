@@ -15,7 +15,7 @@ def get_keyboard():
         keyboard=[
             [types.KeyboardButton(text="📜пользовательское соглашение📜")],
             [
-                types.KeyboardButton(text="125🪙/15% в час/1 день"),
+                types.KeyboardButton(text="175🪙/20% в час/1 день"),
             ],
             [
                 types.KeyboardButton(text="💳мои кредиты💰"),
@@ -59,7 +59,7 @@ async def gay_my_credits(msg: types.Message):
         )
 
 
-@router.message(F.text.lower() == "125🪙/15% в час/1 день")
+@router.message(F.text.lower() == "175🪙/20% в час/1 день")
 async def gay_credit1(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     credlist = dc.get_user_credits(msg.from_user.id)

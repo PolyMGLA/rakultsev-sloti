@@ -57,6 +57,9 @@ class PandoraBox(Gift):
 
     def can_buy(self, id: int) -> bool:
         return True
+    
+    def description(self) -> str:
+        return self.desc
 
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"

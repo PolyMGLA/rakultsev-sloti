@@ -34,7 +34,7 @@ slots_keyboard = types.ReplyKeyboardMarkup(
             types.KeyboardButton(text="👾Профиль👾"),
         ],
         [
-            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="💸магазин💸"),
             types.KeyboardButton(text="🔝Топ казино🎰"),
         ],
         [
@@ -59,7 +59,7 @@ blackjack_keyboard = types.ReplyKeyboardMarkup(
             types.KeyboardButton(text="👾Профиль👾"),
         ],
         [
-            types.KeyboardButton(text="🆘Помощь🆘"),
+            types.KeyboardButton(text="💸магазин💸"),
             types.KeyboardButton(text="🔝Топ казино🎰"),
         ],
         [

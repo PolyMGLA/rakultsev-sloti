@@ -12,6 +12,9 @@ class PromoWelcome(Gift):
 
     def can_buy(self, id: int):
         return len(dg.get_typed_gifts("promo_welcome")) <= 10
+    
+    def description(self) -> str:
+        return self.desc
 
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"

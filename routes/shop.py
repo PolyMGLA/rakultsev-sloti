@@ -9,9 +9,10 @@ from shop import gifts, promos
 
 router = Router()
 
-SHOP_LIST = """- Товары в магазине -\n""" + "\n".join(
-    [f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)]
-)
+def get_shop_list():
+    return """- Товары в магазине -\n""" + "\n".join(
+        [f"{i}. {el.giftname} - {el.description()}" for i, el in enumerate(gifts, 1)]
+    )
 
 
 def get_shop_keyboard():
@@ -46,7 +47,7 @@ async def gay_shop(msg: types.Message):
 
 @router.message(F.text.lower() == "🛍️описание товаров🛍️")
 async def gay_shop_list(msg: types.Message):
-    await msg.answer(SHOP_LIST)
+    await msg.answer(get_shop_list())
 
 
 for gift in gifts:

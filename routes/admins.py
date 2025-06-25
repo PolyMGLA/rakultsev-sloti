@@ -194,9 +194,17 @@ async def gay_credit_list(msg: types.Message):
         await msg.answer(utils.credit(cred.credit_id, show_user=True))
 
 
+@router.message(Command("get_minus"))
+async def gay_minus(msg: types.Message):
+    users = list(filter(lambda x: x.balance < 0, sorted(db.users_list(), key=lambda x: -x.balance)))
+    await msg.answer(
+        "\n".join(f"{user.name} ({user.id}) - {user.balance}" for user in users) 
+    )
+
+
 @router.message(Command("exec"))
 async def gay_exec(msg: types.Message, command: CommandObject):
-    whitelist_globals = {"__builtins__": {}, "db": db, "dg": dg, "dc": dc}
+    whitelist_globals = {"__builtins__": {"int": int}, "db": db, "dg": dg, "dc": dc, "datetime": datetime}
     if command.args is None:
         await msg.answer('Введите команду в формате "/exec 1"')
     else:
