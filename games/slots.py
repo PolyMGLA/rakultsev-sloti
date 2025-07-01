@@ -1,5 +1,7 @@
-from games import utils
+import random
+
 from routes.utils import send_news
+from db import db, dg
 
 RULES = """
 - Правила игры в Слоты -
@@ -33,7 +35,7 @@ for i in range(7):
 
 
 def _spin(arr: list[str]) -> str:
-    return "".join(utils.choice(arr) for i in range(3))
+    return "".join(random.choice(arr) for i in range(3))
 
 
 def secret_regen():
@@ -44,16 +46,20 @@ def secret_regen():
 secret_regen()
 
 
-async def spin(db, dg, id: int) -> str:
+async def spin(id: int) -> str:
     global SECRET
 
     s = _spin(fruits_weighted)
-    bal = db.get_bal(id)
+    bal = db.get(id, "balance")
     newbal = bal - 2
+    lost = 2
     comb = ""
 
     if s == SECRET:
-        newbal += utils.randint(a=-1000, b=1000)
+        cost = random.randint(a=-1000, b=1000)
+        newbal += cost
+        if cost < 0:
+            lost -= cost
         comb += "secret; "
         user = db.get_user(id)
         await send_news(
@@ -78,6 +84,7 @@ async def spin(db, dg, id: int) -> str:
             comb = "🍒Мама! Я спелая вишня🍒"
         case "🍍🍍🍍":
             newbal -= 30
+            lost += 30
             comb = "идешь в ананас"
         case "🍑🍑🍑":
             newbal += 40
@@ -85,17 +92,23 @@ async def spin(db, dg, id: int) -> str:
         case "🌈🌈🌈":
             newbal += 999
             comb = "Absolute cinema"
+            db.add(id, prefix="🌈")
             dg.add_gift(id, "rainbow", "🌈Игрушечная радуга", "absolute sigma")
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} - absolute sigma!!")
         case "💀💀💀":
+            lost += 5000
             newbal -= 5000
             comb = "Вы проиграли хату"
+            db.add(id, prefix="💀")
             dg.add_gift(id, "dead", "💀Игрушечный череп", "проиграл все")
             user = db.get_user(id)
             await send_news(f"{user.prefix}{user.name} проиграл семью в казино")
         case "🍌🍑🍌":
-            newbal += utils.randint(-50, 50)
+            cost = random.randint(-50, 50)
+            if cost < 0:
+                lost -= cost
+            newbal += cost
             comb = "Пайпер Перри..?"
         case _:
             if s.count("🍑") == 2 and s.count("🍍") == 1:
@@ -108,14 +121,16 @@ async def spin(db, dg, id: int) -> str:
                 newbal += 100
                 comb += "2 радуги; "
             if s.count("💀") == 1:
+                lost += 10
                 newbal -= 10
                 comb += "1 череп; "
             if s.count("💀") == 2:
+                lost += 100
                 newbal -= 100
                 comb += "2 черепа; "
     if not comb:
         comb = "ничего"
-    if db.update_bal(id, newbal) and db.add_slot(id):
+    if db.update(id, balance=newbal) and db.add(id, slots_num=1, lost_money=lost):
         return [s, f"Выпало: {comb}\nТекущий баланс: {newbal}"]
 
     return ["Ошибка при крутке"]

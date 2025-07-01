@@ -18,6 +18,7 @@ class CasinoUsers(Base):
     dodep_num = Column("dodep_num", Integer, default=0)
     dodep_date = Column("dodep_date", Integer, default=0)
     visit_date = Column("visit_date", Integer, default=0)
+    lost_money = Column("lost_money", Integer, default=0)
     gifts = relationship(
         "CasinoGifts",
         back_populates="user",

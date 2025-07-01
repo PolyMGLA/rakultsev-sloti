@@ -6,19 +6,38 @@ from aiogram.fsm.context import FSMContext
 from datetime import datetime
 
 from db import db, dc
-from routes.keyboards import credits_keyboard
 
 router = Router()
+
+
+def get_keyboard():
+    return types.ReplyKeyboardMarkup(
+        keyboard=[
+            [types.KeyboardButton(text="📜пользовательское соглашение📜")],
+            [
+                types.KeyboardButton(text="175🪙/20% в час/1 день"),
+            ],
+            [
+                types.KeyboardButton(text="💳мои кредиты💰"),
+                types.KeyboardButton(text="💵погасить кредит💵"),
+            ],
+            [types.KeyboardButton(text="💸магазин💸")],
+        ],
+        resize_keyboard=True,
+        input_field_placeholder="Выберите что хотите сделать",
+    )
+
 
 class PayForm(StatesGroup):
     credit = State()
     pay = State()
 
+
 @router.message(F.text.lower() == "💰кредиты💳")
 async def gay_credits(msg: types.Message):
     await msg.answer(
         "Кредиты. Не забудьте прочитать пользовательское соглашение!",
-        reply_markup=credits_keyboard,
+        reply_markup=get_keyboard(),
     )
 
 
@@ -40,7 +59,7 @@ async def gay_my_credits(msg: types.Message):
         )
 
 
-@router.message(F.text.lower() == "150🪙/10% в час/1 день")
+@router.message(F.text.lower() == "175🪙/20% в час/1 день")
 async def gay_credit1(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     credlist = dc.get_user_credits(msg.from_user.id)
@@ -49,8 +68,8 @@ async def gay_credit1(msg: types.Message):
         return
 
     now = datetime.now().timestamp()
-    if dc.add_credit(user.id, 150, 10, now, now + 86400, cred_period=3600) and db.update_bal(
-        user.id, user.balance + 150
+    if dc.add_credit(user.id, 125, 15, now, now + 86400, cred_period=3600) and db.add(
+        user.id, balance=150
     ):
         await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
     else:
@@ -71,6 +90,7 @@ async def credit_pay1(msg: types.Message, state: FSMContext):
     await msg.answer("Выберите номер кредита, который хотите погасить!")
     await state.set_state(PayForm.credit)
 
+
 @router.message(PayForm.credit)
 async def credit_pay2(msg: types.Message, state: FSMContext):
     if msg.text.isdigit():
@@ -87,6 +107,7 @@ async def credit_pay2(msg: types.Message, state: FSMContext):
         await msg.answer("Выберите кредит из списка ваших кредитов! /pay")
         await state.clear()
 
+
 @router.message(PayForm.pay)
 async def credit_pay3(msg: types.Message, state: FSMContext):
     if msg.text.isdigit():
@@ -95,7 +116,9 @@ async def credit_pay3(msg: types.Message, state: FSMContext):
             user = db.get_user(msg.from_user.id)
             if user.balance >= amount:
                 cred = dc.get_credit((await state.get_data())["credit_id"])
-                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.update_bal(user.id, user.balance - amount):
+                if dc.update_sum(cred.credit_id, cred.sum - amount) and db.add(
+                    user.id, balance=-amount, lost_money=amount
+                ):
                     await msg.answer("успешно!")
                     await state.clear()
                 else:

@@ -1,5 +1,5 @@
 from aiogram import Router, types, F
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, or_f
 
 from datetime import datetime
 
@@ -9,10 +9,10 @@ from routes.utils import send_news
 from messages import ADMIN_HELP
 from games import slots
 from bot import bot, dp, scheduler
-from middlewares.telegram import TGMiddleWare, TGAdminMiddleWare
+from middlewares.telegram import TGAdminMiddleWare
+from market.data import data
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 router.message.middleware(TGAdminMiddleWare())
 
 
@@ -21,7 +21,14 @@ async def gay_panel(msg: types.Message):
     await msg.answer("Админ панель включена", reply_markup=admin_keyboard)
 
 
-@router.message(F.text.lower() == "посмотреть секрет")
+@router.message(F.text == "📦биржа💰")
+async def gay_marketplace(msg: types.Message):
+    await msg.answer(
+        f"Информация о бирже Rakom:" + f"\nКурс HamsterCoin: {data.hamster_course}"
+    )
+
+
+@router.message(or_f(F.text.lower() == "посмотреть секрет", Command("secret")))
 async def gay_secret_get(msg: types.Message):
     """
     [ADMIN ONLY] Просмотр секретной комбинации
@@ -29,7 +36,9 @@ async def gay_secret_get(msg: types.Message):
     await msg.answer("Секрет: " + slots.SECRET)
 
 
-@router.message(F.text.lower() == "сгенерировать новый секрет")
+@router.message(
+    or_f(F.text.lower() == "сгенерировать новый секрет", Command("secret_gen"))
+)
 async def gay_secret_regen(msg: types.Message):
     """
     [ADMIN ONLY] Генерация новой секретной комбинации
@@ -49,7 +58,7 @@ async def gay_novost(msg: types.Message, command: CommandObject):
         await send_news(command.args)
 
 
-@router.message(F.text.lower() == "количество участников")
+@router.message(or_f(F.text.lower() == "количество участников", Command("user_num")))
 async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Вывод количества пользователей казика
@@ -59,7 +68,7 @@ async def gay_spisok(msg: types.Message):
         await msg.answer(f"количество участников: {len(users)}")
 
 
-@router.message(F.text.lower() == "список участников")
+@router.message(or_f(F.text.lower() == "список участников", Command("user_list")))
 async def gay_spisok(msg: types.Message):
     """
     [ADMIN ONLY] Отправка списка всех участников.
@@ -74,7 +83,7 @@ async def gay_spisok(msg: types.Message):
             await msg.answer(f"{u.prefix}{u.name}, {u.id}")
 
 
-@router.message(F.text.lower() == "тестирование")
+@router.message(or_f(F.text.lower() == "тестирование", Command("test")))
 async def gay_beta(msg: types.Message):
     await msg.answer("панель тестирования включена", reply_markup=test_keyboard)
 
@@ -95,7 +104,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
     if command.args is None:
         await msg.answer("ашипка: напишите айди человека\n /balance <айди>")
     else:
-        await msg.answer(f"{db.get_bal(command.args)}")
+        await msg.answer(f"{db.get(command.args, 'balance')}")
 
 
 @router.message(Command("set_balance"))
@@ -114,7 +123,7 @@ async def gay_balance(msg: types.Message, command: CommandObject):
             "/set_balance <id> <balance>"
         )
         return
-    await msg.answer(f"{db.update_bal(id, ball)}")
+    await msg.answer(f"{db.update(id, balance=ball)}")
 
 
 @router.message(Command("user"))
@@ -126,7 +135,7 @@ async def gay_profile(msg: types.Message, command: CommandObject):
         await msg.answer("Введите команду в формате /user <id>")
     else:
         msgid = int(command.args)
-        await msg.answer(utils.profile(msgid))
+        await msg.answer(utils.profile(msgid, show_id=True))
 
 
 @router.message(Command("gift"))
@@ -161,38 +170,60 @@ async def gay_gifts_list(msg: types.Message):
         )
 
 
+@router.message(Command("find_users"))
+async def gay_find_users(msg: types.Message, command: CommandObject):
+    if command.args is None:
+        await msg.answer("Введите команду в формате /find_users <username>")
+    else:
+        users = db.users_list()
+        users = list(filter(lambda x: x.name.startswith(command.args), users))
+        if users:
+            await msg.answer("\n".join(f"{u.name} - {u.id}" for u in users))
+        else:
+            await msg.answer("не найдено")
+
+
 @router.message(Command("credit"))
 async def gay_credit(msg: types.Message, command: CommandObject):
-    cred = dc.get_credit(int(command.args))
-    await msg.answer(
-        f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}\nВзят на {cred.user.name} ({cred.user_id})"
-    )
+    await msg.answer(utils.credit(int(command.args), show_user=True))
+
 
 @router.message(Command("credit_list"))
 async def gay_credit_list(msg: types.Message):
     for cred in dc.get_all_credits():
-        await msg.answer(
-            f"Кредит №{cred.credit_id} на {cred.sum}🪙 под {cred.perc}% в день. Погасить до {datetime.fromtimestamp(cred.last_date).strftime('%d/%m/%Y, %H:%M:%S')}\nВзят на {cred.user.name} ({cred.user_id})"
-        )
+        await msg.answer(utils.credit(cred.credit_id, show_user=True))
+
+
+@router.message(Command("get_minus"))
+async def gay_minus(msg: types.Message):
+    users = list(filter(lambda x: x.balance < 0, sorted(db.users_list(), key=lambda x: -x.balance)))
+    await msg.answer(
+        "\n".join(f"{user.name} ({user.id}) - {user.balance}" for user in users) 
+    )
 
 
 @router.message(Command("exec"))
 async def gay_exec(msg: types.Message, command: CommandObject):
+    whitelist_globals = {"__builtins__": {"int": int}, "db": db, "dg": dg, "dc": dc, "datetime": datetime}
     if command.args is None:
-        await msg.answer("Введите команду в формате \"/exec 1\"")
+        await msg.answer('Введите команду в формате "/exec 1"')
     else:
         try:
-            await msg.answer(str(eval(command.args)))
+            await msg.answer(str(eval(command.args, whitelist_globals)))
         except Exception as e:
             await msg.answer(str(e))
 
 
+@router.message(Command("send_db"))
+async def gay_send_db(msg: types.Message):
+    doc = types.FSInputFile("./db.db")
+    await msg.answer_document(doc, caption="База данных")
+
+
 @router.message(Command("exit"))
 async def gay_exit(msg: types.Message, command: CommandObject):
-    if command.args is None:
-        await msg.answer("Напишите \"/exit yes\", если точно хотите выключить бота")
-    elif command.args.strip() != "yes":
-        await msg.answer("Напишите \"/exit yes\", если точно хотите выключить бота")
+    if command.args is None or command.args.strip() != "yes":
+        await msg.answer('Напишите "/exit yes", если точно хотите выключить бота')
     else:
         await msg.answer("Выключение бота..")
         await dp.stop_polling()

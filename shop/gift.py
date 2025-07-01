@@ -8,6 +8,9 @@ class Gift:
 
     def can_buy(self, id: int) -> bool:
         return False
+    
+    def description(self) -> str:
+        return self.desc
 
     def shop_cap(self) -> str:
         return ""

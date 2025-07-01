@@ -1,8 +1,8 @@
 .venv/
-.env
+*.env
 .idea/
 __pycache__/
 
-db.db*
+db*.db
 
 *.log

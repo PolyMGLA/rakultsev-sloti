@@ -1,6 +1,8 @@
 from shop.gift import Gift
-from games.utils import randint
 from db import db, dg
+from market.data import data
+
+import random
 
 from aiogram import types
 
@@ -15,15 +17,18 @@ class HamsterCoin(Gift):
 
     def can_buy(self, id: int):
         return True
+    
+    def description(self) -> str:
+        return f"{self.desc} (курс: {data.hamster_course}🪙)"
 
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"
 
     async def open(self, msg: types.Message):
         user = db.get_user(msg.from_user.id)
-        c = randint(1, 50)
+        c = data.hamster_course
 
-        if c <= 5 and not dg.has_gift(msg.from_user.id, "hamster_coin"):
+        if (c <= 2 or c >= 99) and not dg.has_gift(msg.from_user.id, "hamster_coin"):
             dg.add_gift(
                 msg.from_user.id,
                 "hamster_coin",
@@ -31,7 +36,7 @@ class HamsterCoin(Gift):
                 f"тап-тап-тап по хомяку (куплено по курсу {c})",
             )
 
-        if db.update_bal(user.id, user.balance + c):
+        if db.add(user.id, balance=c):
             await msg.answer(
                 f"Текущий курс монеты: {c}\nТекущий баланс: {user.balance + c}"
             )

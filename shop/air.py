@@ -9,6 +9,9 @@ class Air(Gift):
 
     def can_buy(self, id: int):
         return True
+    
+    def description(self) -> str:
+        return self.desc
 
     def shop_cap(self):
         return f"{self.giftname} ({self.cost}🪙)"

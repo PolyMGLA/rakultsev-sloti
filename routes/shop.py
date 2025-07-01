@@ -4,16 +4,15 @@ from aiogram.filters import or_f, Command, CommandObject
 from datetime import datetime
 
 from messages import DONATE
-from middlewares.telegram import TGMiddleWare
 from db import db, dc
 from shop import gifts, promos
 
 router = Router()
-router.message.middleware(TGMiddleWare())
 
-SHOP_LIST = """- Товары в магазине -\n""" + "\n".join(
-    [f"{i}. {el.giftname} - {el.desc}" for i, el in enumerate(gifts, 1)]
-)
+def get_shop_list():
+    return """- Товары в магазине -\n""" + "\n".join(
+        [f"{i}. {el.giftname} - {el.description()}" for i, el in enumerate(gifts, 1)]
+    )
 
 
 def get_shop_keyboard():
@@ -48,7 +47,7 @@ async def gay_shop(msg: types.Message):
 
 @router.message(F.text.lower() == "🛍️описание товаров🛍️")
 async def gay_shop_list(msg: types.Message):
-    await msg.answer(SHOP_LIST)
+    await msg.answer(get_shop_list())
 
 
 for gift in gifts:
@@ -57,8 +56,8 @@ for gift in gifts:
     async def gay_gift(msg: types.Message, gift=gift):
         user = db.get_user(msg.from_user.id)
         if gift.can_buy(msg.from_user.id):
-            if user.balance >= gift.cost and db.update_bal(
-                msg.from_user.id, user.balance - gift.cost
+            if user.balance >= gift.cost and db.add(
+                msg.from_user.id, balance=-gift.cost, lost_money=gift.cost
             ):
                 await msg.answer(f"Куплено: {gift.giftname}")
                 await gift.open(msg)

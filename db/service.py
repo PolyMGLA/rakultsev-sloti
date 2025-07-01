@@ -11,6 +11,8 @@ from sqlalchemy.orm import sessionmaker
 
 from datetime import datetime
 
+import traceback
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +34,7 @@ class UserService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 
@@ -44,14 +46,13 @@ class UserService:
             session.commit()
             return True
         return False
-    
+
     def remove_user(self, id: int) -> bool:
         with self._session_scope() as session:
-            session.query(CasinoUsers).where(CasinoUsers.id==id).delete()
+            session.query(CasinoUsers).where(CasinoUsers.id == id).delete()
             session.commit()
             return True
         return False
-
 
     def get_user(self, id: int) -> Optional[CasinoUsers]:
         with self._session_scope() as session:
@@ -61,39 +62,24 @@ class UserService:
         with self._session_scope() as session:
             return session.query(CasinoUsers).all()
 
-    def get_bal(self, id: int) -> bool | int:
+    def get(self, id: int, arg: str):
         with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first().balance
-        return False
+            return getattr(session.query(CasinoUsers).filter_by(id=id).first(), arg)
 
-    def update_bal(self, id: int, newbal: int) -> bool:
+    def update(self, id: int, **kwargs) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.balance = newbal
+            for arg in kwargs:
+                setattr(user, arg, kwargs[arg])
             session.commit()
             return True
         return False
 
-    def update_prefix(self, id: int, prefix: str) -> bool:
+    def add(self, id: int, **kwargs) -> bool:
         with self._session_scope() as session:
             user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.prefix = prefix
-            session.commit()
-            return True
-        return False
-
-    def add_slot(self, id: int) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.slots_num += 1
-            session.commit()
-            return True
-        return False
-
-    def add_dodep(self, id: int) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.dodep_num += 1
+            for arg in kwargs:
+                setattr(user, arg, getattr(user, arg) + kwargs[arg])
             session.commit()
             return True
         return False
@@ -105,26 +91,6 @@ class UserService:
                 .order_by(getattr(CasinoUsers, attr))
                 .all()[-n:][::-1]
             )
-
-    def get_dodep_date(self, id) -> Optional[CasinoUsers]:
-        with self._session_scope() as session:
-            return session.query(CasinoUsers).filter_by(id=id).first().dodep_date
-
-    def set_dodep_date(self, id, date) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.dodep_date = date
-            session.commit()
-            return True
-        return False
-
-    def set_visit_date(self, id) -> bool:
-        with self._session_scope() as session:
-            user = session.query(CasinoUsers).filter_by(id=id).first()
-            user.visit_date = int(datetime.now().timestamp())
-            session.commit()
-            return True
-        return False
 
     def get_visit_list(self) -> Optional[list[CasinoUsers]]:
         with self._session_scope() as session:
@@ -149,7 +115,7 @@ class GiftsService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 
@@ -161,19 +127,32 @@ class GiftsService:
         with self._session_scope() as session:
             return session.query(CasinoGifts).all()
         return []
-    
+
     def get_typed_gifts(self, gift_type: str) -> list[CasinoGifts]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).where(CasinoGifts.gift_type == gift_type).all()
+            return (
+                session.query(CasinoGifts)
+                .where(CasinoGifts.gift_type == gift_type)
+                .all()
+            )
         return []
 
     def get_user_gifts(self, user_id: int, show_gift=True) -> list[CasinoGifts]:
         with self._session_scope() as session:
-            return session.query(CasinoGifts).filter_by(user_id=user_id, show_gift=show_gift).all()
+            return (
+                session.query(CasinoGifts)
+                .filter_by(user_id=user_id, show_gift=show_gift)
+                .all()
+            )
         return []
 
     def add_gift(
-        self, user_id: int, gift_type: str, gift_name: str, descr: str = "", show_gift: bool = True
+        self,
+        user_id: int,
+        gift_type: str,
+        gift_name: str,
+        descr: str = "",
+        show_gift: bool = True,
     ) -> bool:
         with self._session_scope() as session:
             session.add(
@@ -227,7 +206,7 @@ class CreditsService:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(str(e))
+            logger.error(str(e) + "\n" + traceback.format_exc())
         finally:
             session.close()
 
@@ -282,7 +261,13 @@ class CreditsService:
         return False
 
     def add_credit(
-        self, user_id: int, sum: int, perc: int, next_date: int, last_date: int, cred_period: int = 86400
+        self,
+        user_id: int,
+        sum: int,
+        perc: int,
+        next_date: int,
+        last_date: int,
+        cred_period: int = 86400,
     ) -> bool:
         with self._session_scope() as session:
             session.add(
