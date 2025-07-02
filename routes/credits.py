@@ -68,8 +68,8 @@ async def gay_credit1(msg: types.Message):
         return
 
     now = datetime.now().timestamp()
-    if dc.add_credit(user.id, 125, 15, now, now + 86400, cred_period=3600) and db.add(
-        user.id, balance=150
+    if dc.add_credit(user.id, 175, 15, now, now + 86400, cred_period=3600) and db.add(
+        user.id, balance=175
     ):
         await msg.answer("Кредит успешно взят! Не забудьте отдать его в срок..")
     else:
