@@ -51,7 +51,7 @@ async def update_num_text(message: types.Message, new_value: int):
 
 
 @router.message(or_f(F.text.lower() == "✨играть✨", Command("blackjack")))
-async def gay_stavka(msg: types.Message, state: FSMContext):
+async def mh_stavka(msg: types.Message, state: FSMContext):
     await state.clear()
     if db.get(msg.from_user.id, "balance") <= 0:
         await msg.answer("Недостаточно денег.\nБез додепа не обойтись /dodep")
@@ -137,7 +137,7 @@ async def edit_blackjack_status(
 
 
 @router.callback_query(F.data == "start_game")
-async def gay_start_game(callback: types.CallbackQuery, state: FSMContext):
+async def mh_start_game(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(BlackjackState.sum)
     user_value = (await state.get_data())["sum"]
     db.add(callback.from_user.id, balance=-user_value, lost_money=user_value)
@@ -172,7 +172,7 @@ async def gay_start_game(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.message(and_f(F.text == "🃏взять карту", BlackjackState.sum))
-async def gay_get_card(msg: types.Message, state: FSMContext):
+async def mh_get_card(msg: types.Message, state: FSMContext):
     await blackjack.add_card(state, "my_cards")
     user_sum: int = (await state.get_data())["sum"]
     my_cards: list[str] = (await state.get_data())["my_cards"]
@@ -240,7 +240,7 @@ async def gay_get_card(msg: types.Message, state: FSMContext):
 
 
 @router.message(and_f(F.text == "🛑стоп", BlackjackState.sum))
-async def gay_stop(msg: types.Message, state: FSMContext):
+async def mh_stop(msg: types.Message, state: FSMContext):
     user_sum: int = (await state.get_data())["sum"]
     my_cards: list[str] = (await state.get_data())["my_cards"]
     dealer_cards: list[str] = (await state.get_data())["dealer_cards"]
@@ -320,7 +320,7 @@ async def gay_stop(msg: types.Message, state: FSMContext):
 
 
 @router.message(and_f(F.text == "🏳️сдаться", BlackjackState.sum))
-async def gay_exit(msg: types.Message, state: FSMContext):
+async def mh_exit(msg: types.Message, state: FSMContext):
     user_sum: int = (await state.get_data())["sum"]
 
     if db.add(msg.from_user.id, balance=(user_sum // 2)):

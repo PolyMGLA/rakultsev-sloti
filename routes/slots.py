@@ -9,7 +9,7 @@ router = Router()
 
 
 @router.message(or_f(F.text.lower() == "✨крутить✨", Command("slots")))
-async def gay_spin(msg: types.Message):
+async def mh_spin(msg: types.Message):
     """
     Крутим жоска
     """
@@ -25,5 +25,5 @@ async def gay_spin(msg: types.Message):
 
 
 @router.message(F.text.lower() == "🔥правила слотов🔥")
-async def gay_slots_help(msg: types.Message):
+async def mh_slots_help(msg: types.Message):
     await msg.answer(RULES)

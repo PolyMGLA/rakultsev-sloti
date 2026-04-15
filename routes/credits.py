@@ -34,7 +34,7 @@ class PayForm(StatesGroup):
 
 
 @router.message(F.text.lower() == "💰кредиты💳")
-async def gay_credits(msg: types.Message):
+async def mh_credits(msg: types.Message):
     await msg.answer(
         "Кредиты. Не забудьте прочитать пользовательское соглашение!",
         reply_markup=get_keyboard(),
@@ -42,13 +42,13 @@ async def gay_credits(msg: types.Message):
 
 
 @router.message(F.text.lower() == "📜пользовательское соглашение📜")
-async def gay_doc(msg: types.Message):
+async def mh_doc(msg: types.Message):
     doc = types.FSInputFile("./doc/Пользовательское соглашение.docx")
     await msg.answer_document(doc, caption="Настоящее пользовательское соглашение📜")
 
 
 @router.message(or_f(F.text.lower() == "💳мои кредиты💰", Command("my_credits")))
-async def gay_my_credits(msg: types.Message):
+async def mh_my_credits(msg: types.Message):
     credlist = dc.get_user_credits(msg.from_user.id)
     if len(credlist) == 0:
         await msg.answer("Кредитов нет!")
@@ -60,7 +60,7 @@ async def gay_my_credits(msg: types.Message):
 
 
 @router.message(F.text.lower() == "175🪙/20% в час/1 день")
-async def gay_credit1(msg: types.Message):
+async def mh_credit1(msg: types.Message):
     user = db.get_user(msg.from_user.id)
     credlist = dc.get_user_credits(msg.from_user.id)
     if len(credlist) >= 5:

@@ -39,21 +39,20 @@ def get_shop_keyboard():
 
 
 @router.message(or_f(F.text.lower() == "💸магазин💸", Command("shop")))
-async def gay_shop(msg: types.Message):
+async def mh_shop(msg: types.Message):
     shop_keyboard = get_shop_keyboard()
 
     await msg.answer("Добро пожаловать в магазин💸", reply_markup=shop_keyboard)
 
 
 @router.message(F.text.lower() == "🛍️описание товаров🛍️")
-async def gay_shop_list(msg: types.Message):
+async def mh_shop_list(msg: types.Message):
     await msg.answer(get_shop_list())
 
 
 for gift in gifts:
-
     @router.message(F.text == gift.shop_cap())
-    async def gay_gift(msg: types.Message, gift=gift):
+    async def mh_gift(msg: types.Message, gift=gift):
         user = db.get_user(msg.from_user.id)
         if gift.can_buy(msg.from_user.id):
             if user.balance >= gift.cost and db.add(
@@ -68,11 +67,11 @@ for gift in gifts:
 
 
 @router.message(F.text.startswith("#"))
-async def gay_promo(msg: types.Message):
+async def mh_promo(msg: types.Message):
     if msg.text in promos and promos[msg.text].can_buy(msg.from_user.id):
         await promos[msg.text].open(msg)
 
 
 @router.message(F.text.lower() == "💸донат админам💸")
-async def gay_donate(msg: types.Message):
+async def mh_donate(msg: types.Message):
     await msg.answer(DONATE)

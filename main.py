@@ -1,4 +1,3 @@
-# импорт всякой залупы
 import asyncio
 
 from aiogram import types, F
@@ -34,7 +33,7 @@ logging.getLogger("aiogram.event").propagate = False
 
 
 @dp.message(Command("start"))
-async def gay_start(msg: types.Message, command: CommandObject):
+async def mh_start(msg: types.Message, command: CommandObject):
     """
     Регистрация пользователя (попытка зарегать)
     """
@@ -56,7 +55,7 @@ async def gay_start(msg: types.Message, command: CommandObject):
 
 
 @dp.message(or_f(F.text.lower() == "👥посетители👥", Command("visitors")))
-async def gay_visitors(msg: types.Message):
+async def mh_visitors(msg: types.Message):
     """
     Список пользователей, которые активничали последнюю минуту
     """
@@ -68,7 +67,7 @@ async def gay_visitors(msg: types.Message):
 
 
 @dp.message(or_f(F.text.lower() == "🆘помощь🆘", Command("help")))
-async def gay_help(msg: types.Message):
+async def mh_help(msg: types.Message):
     """
     Собсна текст помощи утопающим
     """
@@ -76,7 +75,7 @@ async def gay_help(msg: types.Message):
 
 
 @dp.message(or_f(F.text.lower() == "👾профиль👾", Command("profile")))
-async def gay_profile(msg: types.Message):
+async def mh_profile(msg: types.Message):
     """
     Инфо о профиле пользователя
     """
@@ -84,7 +83,7 @@ async def gay_profile(msg: types.Message):
 
 
 @dp.message(F.text.lower() == "🔥правила🔥")
-async def gay_rules(msg: types.Message):
+async def mh_rules(msg: types.Message):
     """
     Текст правил всех игр (мне точно надо это писать?)
 
@@ -94,7 +93,7 @@ async def gay_rules(msg: types.Message):
 
 
 @dp.message(or_f(F.text.lower() == "💲мега ласт деп💲", Command("dodep")))
-async def gay_dodep(msg: types.Message):
+async def mh_dodep(msg: types.Message):
     """
     Функция для пополнения баланса на аккаунте (собственно говоря, додеп)
     """
@@ -120,7 +119,7 @@ async def gay_dodep(msg: types.Message):
 
 
 @dp.message(or_f(F.text.lower() == "🔝топ казино🎰", Command("top")))
-async def gay_top(msg: types.Message):
+async def mh_top(msg: types.Message):
     """
     Топ казино по балансу, круткам слотов и додепам
     """
@@ -148,24 +147,24 @@ async def gay_top(msg: types.Message):
 
 
 @dp.message(Command("menu"))
-async def gay_menu(msg: types.Message):
+async def mh_menu(msg: types.Message):
     await msg.answer("Добро пожаловать, великий додепер", reply_markup=menu_keyboard)
 
 
 @dp.message(F.text.lower() == "♣блекджек🃏")
-async def gay_menu_blackjack(msg: types.Message):
+async def mh_menu_blackjack(msg: types.Message):
     await msg.answer(
         "Вы дождались.\nДобро пожаловать в блэкджек", reply_markup=blackjack_keyboard
     )
 
 
 @dp.message(F.text.lower() == "🎰cлоты🎰")
-async def gay_menu_slots(msg: types.Message):
+async def mh_menu_slots(msg: types.Message):
     await msg.answer("Добро пожаловать в слоты", reply_markup=slots_keyboard)
 
 
 @dp.message(F.text.lower() == "🔙назад🔙")
-async def gay_back(msg: types.Message):
+async def mh_back(msg: types.Message):
     await msg.answer("Добро пожаловать в меню", reply_markup=menu_keyboard)
 
 

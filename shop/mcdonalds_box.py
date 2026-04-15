@@ -29,7 +29,6 @@ class MacDonaldsBox(Gift):
         ch = random.randint(1, 50)
 
         if ch == 1 and db.add(user.id, balance=-2000, lost_money=2000):
-            # await send_news(f"У пользователя {user.name} выпала мама из окнааа!!!! (бокс из мака)")
             await msg.answer("Выпало: проверь баланс")
         elif 2 <= ch <= 15 and db.add(user.id, balance=-30, lost_money=30, prefix="🐔"):
             await msg.answer("Выпало: 🐔курица🐔 (не приготовленная? -30🪙)")
